@@ -1,0 +1,78 @@
+erDiagram
+    direction LR
+    USERS ||--o{ DELIVERY_PLANS : creates
+    CUSTOMERS ||--o{ ORDERS : places
+    DELIVERY_PLANS ||--o{ DELIVERY_JOBS : contains
+    DELIVERY_JOBS ||--o{ DELIVERY_STOPS : has_up_to_3
+    ORDERS ||--o{ DELIVERY_STOPS : appears_in_alternatives
+
+    USERS {
+        int id PK
+        varchar username UK
+        varchar password_hash
+        varchar display_name
+        boolean is_active
+    }
+    CUSTOMERS {
+        int id PK
+        varchar name
+        varchar phone
+        varchar address
+        decimal latitude
+        decimal longitude
+        varchar zone
+        boolean is_active
+        int version
+    }
+    ORDERS {
+        int id PK
+        int customer_id FK
+        date delivery_date
+        tinyint quantity "1 to 3 boxes"
+        enum status
+        int version
+    }
+    DELIVERY_PLANS {
+        int id PK
+        int created_by FK
+        date delivery_date
+        datetime departure_at
+        datetime deadline_at
+        enum status
+        date confirmed_delivery_date UK "generated"
+        datetime confirmed_at
+        int price_per_box_sat
+        int food_cost_per_box_sat
+        int call_fee_sat
+        int rate_per_box_km_sat
+        decimal shop_latitude
+        decimal shop_longitude
+        tinyint safety_buffer_minutes
+        enum route_mode
+        json settings_json
+    }
+    DELIVERY_JOBS {
+        int id PK "UK with plan_id"
+        int plan_id FK "UK with id"
+        varchar job_code UK
+        char color
+        int distance_m
+        json geometry_json
+        datetime valid_until
+    }
+    DELIVERY_STOPS {
+        int id PK
+        int job_id FK "UK with sequence_no"
+        int plan_id FK "UK with order_id"
+        int order_id FK "UK with plan_id"
+        tinyint sequence_no "1 to 3, unique per job"
+        datetime estimated_delivery_at
+        int order_version
+        int customer_version
+        tinyint quantity_snapshot
+        varchar customer_name_snapshot
+        varchar phone_snapshot
+        varchar address_snapshot
+        decimal latitude_snapshot
+        decimal longitude_snapshot
+    }

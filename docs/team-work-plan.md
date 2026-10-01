@@ -1,6 +1,6 @@
 **แบ่งงานทีม 4 คน — ระบบจัดเส้นทางและแบ่งงานไรเดอร์ส่งด่วนมื้อเที่ยง**
 
-แผนนี้แบ่งงานทั้ง frontend และ backend สำหรับมินิโปรเจกต์ปี 3 โดยใช้ Node.js + Express + TypeScript + SQLite และ Angular ตามแบบที่วางไว้ ใช้ Figma และ frontend ต้นแบบที่มีแล้วเป็นจุดเริ่มต้น
+แผนนี้แบ่งงานทั้ง frontend และ backend สำหรับมินิโปรเจกต์ปี 3 โดยใช้ Node.js + Express + TypeScript + MySQL 8.4 และ Angular ตามแบบที่วางไว้ ใช้ Figma และ frontend ต้นแบบที่มีแล้วเป็นจุดเริ่มต้น ดูตารางและ ER Diagram ใน `mysql-database/design.md` ของไฟล์ส่งมอบ หรือ `database/design.md` ของ repository
 
 | สมาชิก | รับผิดชอบหลัก | งานที่ต้องทำ | สิ่งที่ส่งให้ทีม |
 |---|---|---|---|
@@ -15,8 +15,6 @@
 
 ```text
 backend/
-  sql/schema.sql                       # คนที่ 1
-  sql/seed.sql                         # คนที่ 1
   src/db.ts                            # คนที่ 1
   src/routes/auth.routes.ts            # คนที่ 1
   src/routes/customers.routes.ts       # คนที่ 1
@@ -27,7 +25,11 @@ backend/
   src/services/pricing.service.ts      # คนที่ 2
   src/services/routing.service.ts      # คนที่ 2
 
-frontend/src/app/
+database/
+  schema.sql                           # คนที่ 1; มีแบบ MySQL แล้ว
+  seed.sql                             # คนที่ 1
+
+src/app/
   pages/overview/                      # คนที่ 3
   pages/customers/                     # คนที่ 3
   components/route-map/                # คนที่ 3
@@ -108,5 +110,6 @@ Frontend ต้นแบบปัจจุบันรวม 4 หน้าจ�
 
 - `backend-design.md`: แบบ backend ฐานข้อมูล API และวิธีจัดเส้นทาง
 - `frontend-design.md`: ลิงก์ Figma หน้าจอและ design tokens
-- `lunch-dispatch/`: Angular frontend ที่รันได้ พร้อม README และการตรวจเงื่อนไข
-- ซอร์ส frontend อยู่ที่ราก repository นี้ ให้สมาชิก Clone ผ่าน GitHub Desktop ตาม `github-guide-beginner.md`
+- `database/design.md`: แบบ MySQL และ ER Diagram ใน repository
+- `database/schema.sql`: SQL สร้างตารางและ views
+- ซอร์ส Angular อยู่ที่ราก repository มี README และการตรวจเงื่อนไข ให้ทีม Clone ตาม `github-guide-beginner.md`

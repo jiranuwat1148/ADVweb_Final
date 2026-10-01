@@ -38,6 +38,8 @@ npm test        # ตรวจเงื่อนไขจัดเส้นท�
 - [คู่มือ GitHub เริ่มจากศูนย์](docs/github-guide-beginner.md)
 - [แผนแบ่งงานทีม 4 คน](docs/team-work-plan.md)
 - [แบบ backend ฐานข้อมูล และ API](docs/backend-design.md)
+- [แบบ MySQL และ ER Diagram](database/design.md)
+- [SQL สร้างฐานข้อมูล MySQL](database/schema.sql)
 - [แบบ frontend และลิงก์ Figma](docs/frontend-design.md)
 
 **หน้าจอและสิ่งที่ทำได้**

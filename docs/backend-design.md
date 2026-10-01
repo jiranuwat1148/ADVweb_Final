@@ -2,14 +2,14 @@
 
 เอกสารนี้ออกแบบสำหรับมินิโปรเจกต์นักศึกษาปี 3 เน้นความเรียบง่าย ทำตามได้จริง และรองรับออเดอร์ประมาณ 20–30 รายการต่อวัน
 
-แนะนำ **Node.js + Express + TypeScript + SQLite โดยใช้ backend แอปเดียว** เพราะทำ CRUD ได้ตรงไปตรงมา และแยกอัลกอริทึมจัดเส้นทางออกมาเป็นไฟล์เดียวให้ทดสอบง่าย
+ใช้ **Node.js + Express + TypeScript + MySQL 8.4 โดยใช้ backend แอปเดียว** เพราะทำ CRUD ได้ตรงไปตรงมา และแยกอัลกอริทึมจัดเส้นทางออกมาเป็นไฟล์เดียวให้ทดสอบง่าย
 
-Express รองรับการแบ่ง API เป็นกลุ่มผ่าน Router ส่วน SQLite เก็บฐานข้อมูลเป็นไฟล์ **บนเครื่อง Server** ซึ่งเหมาะกับงานขนาดเล็กและงานสอน โดย Angular ติดต่อฐานข้อมูลผ่าน backend เท่านั้น ([Express](https://expressjs.com/en/guide/using-middleware/), [SQLite](https://www.sqlite.org/whentouse.html))
+Express รองรับการแบ่ง API เป็นกลุ่มผ่าน Router ส่วนฐานข้อมูลใช้ **MySQL บน Server** โดย Angular ติดต่อฐานข้อมูลผ่าน backend เท่านั้น ใช้ InnoDB และ utf8mb4 ตาม [แบบ MySQL และ ER Diagram](../database/design.md) ซึ่งมี SQL ฉบับที่นำไปพัฒนาต่อได้ ([Express](https://expressjs.com/en/guide/using-middleware/), [MySQL Foreign Keys](https://dev.mysql.com/doc/refman/8.4/en/create-table-foreign-keys.html))
 
 ```mermaid
 flowchart LR
     A["Angular: เจ้าของร้าน / ไรเดอร์"] -->|REST API| B["Express + TypeScript"]
-    B --> C[("SQLite บน Server")]
+    B --> C[("MySQL บน Server")]
     B --> D["บริการคำนวณเส้นทางบนถนน"]
 ```
 
@@ -29,24 +29,24 @@ flowchart LR
 | ตาราง | ข้อมูลสำคัญ | ใช้ทำอะไร |
 |---|---|---|
 | `users` | `id`, `username`, `password_hash` | บัญชีเจ้าของร้าน |
-| `customers` | `id`, `name`, `phone`, `address`, `lat`, `lng`, `is_active` | ข้อมูลลูกค้าและตำแหน่งบ้าน |
+| `customers` | `id`, `name`, `phone`, `address`, `latitude`, `longitude`, `is_active`, `version` | ข้อมูลลูกค้าและตำแหน่งบ้าน |
 | `orders` | `id`, `customer_id`, `delivery_date`, `quantity`, `status`, `version` | ออเดอร์ของแต่ละวัน |
 | `delivery_plans` | `id`, `delivery_date`, `departure_at`, `deadline_at`, `status`, `settings_json` | แผนแต่ละรอบที่คำนวณ |
-| `delivery_jobs` | `id`, `plan_id`, `job_code`, `color`, `total_boxes`, `distance_m`, `delivery_cost`, `geometry_json` | ใบงานของไรเดอร์แต่ละคน |
-| `delivery_stops` | `id`, `job_id`, `order_id`, `sequence`, `estimated_delivery_at`, `snapshot_json` | จุดส่งเรียงตามลำดับ |
+| `delivery_jobs` | `id`, `plan_id`, `job_code`, `color`, `distance_m`, `geometry_json`, `valid_until` | ใบงานไรเดอร์ จำนวนกล่องและค่าส่งอ่านจาก view |
+| `delivery_stops` | `id`, `job_id`, `plan_id`, `order_id`, `sequence_no`, `estimated_delivery_at`, ฟิลด์ snapshot | จุดส่งเรียงตามลำดับ |
 
 ความสัมพันธ์หลักคือ ลูกค้าหนึ่งคนมีหลายออเดอร์ → แผนหนึ่งมีหลายใบงาน → ใบงานหนึ่งมีหลายจุดส่ง
 
-`snapshot_json` เก็บสำเนาชื่อ เบอร์โทร พิกัด และจำนวนกล่องตอนสร้างแผน เพื่อให้ใบงานเก่ายังคงข้อมูลเดิมเมื่อมีการแก้ไขข้อมูลลูกค้า ส่วน `settings_json` เก็บราคา ต้นทุน ความเร็ว และสูตรค่าส่งที่ใช้คำนวณแผนนั้น
+ฟิลด์ snapshot ใน `delivery_stops` เก็บสำเนาชื่อ เบอร์โทร พิกัด และจำนวนกล่องตอนสร้างแผน เพื่อให้ใบงานเก่ายังคงข้อมูลเดิมเมื่อแก้ข้อมูลลูกค้า ราคาและต้นทุนเก็บในคอลัมน์ของ `delivery_plans` ส่วน `settings_json` เก็บความเร็ว เวลาส่งมอบ และค่าอัลกอริทึมที่ใช้คำนวณแผนนั้น ใช้ `v_job_summary` และ `v_plan_summary` สรุปยอดโดยไม่เก็บยอดซ้ำ
 
 แนะนำเก็บเงินเป็นจำนวนเต็มหน่วยสตางค์ และระยะทางเป็นเมตร แล้วแปลงหน่วยตอนแสดงผล
 
 สถานะเริ่มต้นที่ใช้ได้:
 
-- ออเดอร์: `PENDING`, `ASSIGNED`, `CANCELLED`
+- ออเดอร์: `PENDING`, `ASSIGNED`, `DELIVERED`, `CANCELLED`
 - แผน: `DRAFT`, `CONFIRMED`
 
-กำหนด `job_code` ให้ไม่ซ้ำ และ `sequence` ให้ไม่ซ้ำภายในใบงานเดียวกัน ส่วนลูกค้าที่มีประวัติออเดอร์ให้ปิดใช้งานแทนการลบข้อมูลถาวร
+กำหนด `job_code` ให้ไม่ซ้ำ และ `sequence_no` ให้ไม่ซ้ำภายในใบงานเดียวกัน จำกัดลำดับเป็น 1–3 และบังคับออเดอร์ไม่ซ้ำในแผนเดียวกันด้วย UNIQUE (plan_id, order_id) ส่วนลูกค้าที่มีประวัติออเดอร์ให้ปิดใช้งานแทนการลบข้อมูลถาวร
 
 **API หลักออกแบบได้ประมาณนี้** ทุก API ของเจ้าของร้านต้องผ่านการเข้าสู่ระบบ
 
