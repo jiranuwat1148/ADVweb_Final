@@ -26,7 +26,7 @@ customerRouter.get("/:id", async (req, res) => {
     const [rows] = await conn.execute<RowDataPacket[]>(
       "SELECT * FROM customer WHERE id = ?",
       [customerId]
-    );
+    );  
     if (rows.length === 0) {
       res.status(404).json({
         message: "ไม่พบข้อมูลลูกค้า",
@@ -74,7 +74,7 @@ customerRouter.post("/", async (req, res) => {
     latitude < -90 || // ตรวจว่าพิกัด latitude อยู่ในช่วง -90 ถึง 90
     latitude > 90 || // ตรวจว่าพิกัด latitude อยู่ในช่วง -90 ถึง 90
     typeof longitude !== "number" ||
-    !Number.isFinite(longitude) ||
+    !Number.isFinite(longitude) || 
     longitude < -180 || // ตรวจว่าพิกัด longitude อยู่ในช่วง -180 ถึง 180
     longitude > 180
   ) {
@@ -202,6 +202,57 @@ customerRouter.put("/:id", async (req, res) => {
 
     res.status(500).json({
       message: "แก้ไขลูกค้าไม่สำเร็จ",
+    });
+  }
+});
+
+customerRouter.delete("/:id", async (req, res) => {
+  // 1. อ่านเลขลูกค้าจาก URL
+  const id = Number(req.params.id);
+
+  // 2. ตรวจว่าเป็นเลขลูกค้าที่ถูกต้อง
+  if (!Number.isSafeInteger(id) || id < 1 || id > 4294967295) {
+    res.status(400).json({ message: "id ลูกค้าไม่ถูกต้อง" });
+    return;
+  }
+
+  try {
+    // 3. ลบลูกค้าตาม id
+    const [result] = await conn.execute<ResultSetHeader>(
+      "DELETE FROM customer WHERE id = ?",
+      [id]
+    );
+
+    // 4. ถ้าไม่มีแถวถูกลบ แปลว่าไม่พบลูกค้า
+    if (result.affectedRows === 0) {
+      res.status(404).json({ message: "ไม่พบลูกค้า" });
+      return;
+    }
+
+    // 5. ตอบกลับเมื่อลบสำเร็จ
+    res.status(200).json({
+      message: "ลบลูกค้าเรียบร้อยแล้ว",
+      id,
+    });
+  } catch (error) {
+    // 6. ลูกค้าที่มีออเดอร์อยู่จะติดเงื่อนไข Foreign Key
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "ER_ROW_IS_REFERENCED_2"
+    ) {
+      res.status(409).json({
+        message: "ลบลูกค้าไม่ได้ เนื่องจากลูกค้านี้มีออเดอร์อยู่",
+      });
+      return;
+    }
+
+    // 7. ข้อผิดพลาดอื่น
+    console.error("DELETE /api/customers/:id:", error);
+
+    res.status(500).json({
+      message: "ลบลูกค้าไม่สำเร็จ",
     });
   }
 });
