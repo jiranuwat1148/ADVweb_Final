@@ -1,0 +1,41 @@
+@import 'tailwindcss';
+@import './styles/lunch-ui.css';
+
+@plugin 'daisyui' {
+  themes: false;
+}
+
+@plugin 'daisyui/theme' {
+  name: 'lunch';
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+  --color-base-100: #ffffff;
+  --color-base-200: #f6f8f5;
+  --color-base-300: #e4e9e3;
+  --color-base-content: #20342b;
+  --color-primary: #217a54;
+  --color-primary-content: #ffffff;
+  --color-secondary: #163e32;
+  --color-secondary-content: #ffffff;
+  --color-accent: #d97058;
+  --color-accent-content: #ffffff;
+  --color-neutral: #163e32;
+  --color-neutral-content: #ffffff;
+  --color-info: #5f91cb;
+  --color-info-content: #ffffff;
+  --color-success: #217a54;
+  --color-success-content: #ffffff;
+  --color-warning: #d7a45c;
+  --color-warning-content: #20342b;
+  --color-error: #d97058;
+  --color-error-content: #ffffff;
+  --radius-selector: 0.75rem;
+  --radius-field: 0.75rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+}

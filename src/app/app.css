@@ -1,0 +1,4 @@
+/* รูปแบบทุกหน้าอยู่ใน src/styles/lunch-ui.css เพื่อใช้ร่วมกันเมื่อแยก component */
+:host { display: block; }
+app-customer-page, app-order-page { display: contents; }
+app-customer-page[hidden], app-order-page[hidden] { display: none !important; }

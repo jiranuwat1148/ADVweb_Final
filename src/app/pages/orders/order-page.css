@@ -1,0 +1,12 @@
+:host { display: block; }
+.ld-order-date-filter { align-items: end; }
+.ld-order-date-filter .ld-field { width: min(100%, 220px); }
+.ld-order-customer-phone, .ld-order-date { display: block; color: var(--ld-muted); font-size: 12px; }
+.ld-inline-status--muted { color: var(--ld-muted); }
+.ld-order-delete-confirm { background: var(--ld-coral); }
+.ld-order-filters [aria-pressed='false'] { background: var(--ld-page); color: var(--ld-muted); }
+fieldset { min-width: 0; padding: 0; border: 0; margin: 0; }
+.ld-dialog form { margin: 0; }
+@media (max-width: 640px) {
+  .ld-order-date-filter .ld-field { width: 100%; }
+}

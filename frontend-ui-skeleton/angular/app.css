@@ -1,0 +1,2 @@
+/* รูปแบบทุกหน้าอยู่ใน src/styles/lunch-ui.css เพื่อใช้ร่วมกันเมื่อแยก component */
+:host { display: block; }

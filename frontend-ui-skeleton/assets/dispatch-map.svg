@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="806" height="544" viewBox="0 0 806 544" role="img" aria-labelledby="ld-dispatch-map-title ld-dispatch-map-desc" style="font-family: inherit;">
+  <title id="ld-dispatch-map-title">แผนเส้นทางจัดส่งมื้อเที่ยง</title>
+  <desc id="ld-dispatch-map-desc">แผนที่ตัวอย่างแสดงร้านเที่ยงไว ถนนและพื้นที่มหาวิทยาลัย พร้อมเส้นทางไรเดอร์สี่สี สีละสามจุดส่ง</desc>
+  <defs>
+    <clipPath id="ld-dispatch-map-clip">
+      <rect width="806" height="544" />
+    </clipPath>
+  </defs>
+  <g clip-path="url(#ld-dispatch-map-clip)">
+    <rect width="806" height="544" fill="#F6F8F5" />
+    <g fill="#EAF3ED">
+      <rect x="65" y="24" width="210" height="100" rx="20" />
+      <rect x="440" y="240" width="170" height="92" rx="24" />
+    </g>
+    <rect x="320" y="90" width="124" height="78" rx="10" fill="#E4E9E3" />
+    <rect x="706" y="0" width="100" height="544" fill="#EAF3ED" />
+    <g fill="none" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M0 80 L250 80 L320 160 L796 160" />
+      <path d="M60 0 L60 310 L796 310" />
+      <path d="M200 0 L200 200 L460 200 L600 392" />
+      <path d="M450 0 L450 280 L300 392" />
+      <path d="M0 255 L110 255 L250 390" />
+      <path d="M620 0 L620 110 L760 220" />
+      <path d="M0 350 L796 350" />
+      <path d="M330 0 L330 80" />
+      <path d="M500 160 L500 0" />
+    </g>
+    <g fill="none" stroke="#E4E9E3" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M0 80 L250 80 L320 160 L796 160" />
+      <path d="M60 0 L60 310 L796 310" />
+      <path d="M200 0 L200 200 L460 200 L600 392" />
+      <path d="M450 0 L450 280 L300 392" />
+      <path d="M0 255 L110 255 L250 390" />
+      <path d="M620 0 L620 110 L760 220" />
+      <path d="M0 350 L796 350" />
+      <path d="M330 0 L330 80" />
+      <path d="M500 160 L500 0" />
+    </g>
+    <g fill="#7D8D82" font-size="12" font-weight="500">
+      <text x="79" y="69">มหาวิทยาลัยมหาสารคาม</text>
+      <text x="312" y="183">ถนนขามเรียง</text>
+      <text x="469" y="275">โซนหอพัก</text>
+      <text x="616" y="113">ท่าขอนยาง</text>
+    </g>
+    <g fill="none" stroke="#D97058" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M344 290 L344 200 L200 200 L200 80 L100 80" />
+    </g>
+    <g fill="#D97058" stroke="#FFFFFF" stroke-width="3">
+      <circle cx="200" cy="200" r="12.5" />
+      <circle cx="200" cy="80" r="12.5" />
+      <circle cx="100" cy="80" r="12.5" />
+    </g>
+    <g fill="#FFFFFF" font-size="12" font-weight="500" text-anchor="middle">
+      <text x="200" y="204">1</text>
+      <text x="200" y="84">2</text>
+      <text x="100" y="84">3</text>
+    </g>
+    <g fill="none" stroke="#8B75C9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M344 290 L450 290 L450 160 L570 160 L570 75" />
+    </g>
+    <g fill="#8B75C9" stroke="#FFFFFF" stroke-width="3">
+      <circle cx="450" cy="290" r="12.5" />
+      <circle cx="450" cy="160" r="12.5" />
+      <circle cx="570" cy="75" r="12.5" />
+    </g>
+    <g fill="#FFFFFF" font-size="12" font-weight="500" text-anchor="middle">
+      <text x="450" y="294">1</text>
+      <text x="450" y="164">2</text>
+      <text x="570" y="79">3</text>
+    </g>
+    <g fill="none" stroke="#5F91CB" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M344 290 L344 350 L620 350 L620 225 L710 225" />
+    </g>
+    <g fill="#5F91CB" stroke="#FFFFFF" stroke-width="3">
+      <circle cx="460" cy="350" r="12.5" />
+      <circle cx="620" cy="350" r="12.5" />
+      <circle cx="710" cy="225" r="12.5" />
+    </g>
+    <g fill="#FFFFFF" font-size="12" font-weight="500" text-anchor="middle">
+      <text x="460" y="354">1</text>
+      <text x="620" y="354">2</text>
+      <text x="710" y="229">3</text>
+    </g>
+    <g fill="none" stroke="#217A54" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M344 290 L200 290 L200 255 L65 255 L65 165" />
+    </g>
+    <g fill="#217A54" stroke="#FFFFFF" stroke-width="3">
+      <circle cx="200" cy="255" r="12.5" />
+      <circle cx="65" cy="255" r="12.5" />
+      <circle cx="65" cy="165" r="12.5" />
+    </g>
+    <g fill="#FFFFFF" font-size="12" font-weight="500" text-anchor="middle">
+      <text x="200" y="259">1</text>
+      <text x="65" y="259">2</text>
+      <text x="65" y="169">3</text>
+    </g>
+    <rect x="325" y="271" width="38" height="38" rx="12" fill="#163E32" />
+    <text x="344" y="295" fill="#FFFFFF" font-size="14" font-weight="600" text-anchor="middle">ท</text>
+    <rect x="307" y="313" width="74" height="36" fill="#FFFFFF" />
+    <text x="315" y="335" fill="#163E32" font-size="12" font-weight="500">ร้านเที่ยงไว</text>
+  </g>
+</svg>

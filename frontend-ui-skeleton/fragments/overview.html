@@ -1,0 +1,63 @@
+      <section class="ld-page ld-page--overview" id="ld-page-overview" aria-labelledby="ld-overview-heading">
+        <header class="ld-header">
+          <div class="ld-heading">
+            <h1 id="ld-overview-heading">จัดส่งมื้อเที่ยงให้ทันเวลา</h1>
+            <p>พฤหัสบดี 1 ตุลาคม 2569 · รอบจัดส่ง 11:30 น.</p>
+          </div>
+          <div class="ld-header-actions">
+            <span class="badge ld-badge">ข้อมูลจำลอง</span>
+            <button class="btn ld-primary" type="button" data-action="create-plan">สร้างแผนจัดส่ง</button>
+          </div>
+        </header>
+
+        <!-- TODO: สรุปตัวเลขจาก orders และผลคำนวณของทีมจัดเส้นทาง -->
+        <div class="ld-stats" aria-label="สรุปการจัดส่ง">
+          <article class="card ld-stat"><h2 class="ld-stat-label">ออเดอร์วันนี้</h2><p class="ld-stat-number">24</p><p class="ld-stat-note">พร้อมจัดส่งทั้งหมด</p></article>
+          <article class="card ld-stat"><h2 class="ld-stat-label">ข้าวกล่อง</h2><p class="ld-stat-number">48</p><p class="ld-stat-note">เฉลี่ย 2 กล่อง / ออเดอร์</p></article>
+          <article class="card ld-stat"><h2 class="ld-stat-label">ไรเดอร์ที่ใช้</h2><p class="ld-stat-number">10</p><p class="ld-stat-note">ไม่เกิน 3 ออเดอร์ / คน</p></article>
+          <article class="card ld-stat ld-stat--soft"><h2 class="ld-stat-label">กำไรประมาณการ</h2><p class="ld-stat-number"><span class="ld-currency">฿</span>800</p><p class="ld-stat-note">ก่อนค่าใช้จ่ายอื่น</p></article>
+        </div>
+
+        <div class="ld-dispatch-grid">
+          <section class="card ld-map-card" aria-labelledby="ld-map-heading">
+            <div class="ld-map-toolbar">
+              <h2 id="ld-map-heading">แผนเส้นทางจัดส่ง</h2>
+              <div class="ld-map-controls">
+                <span class="badge ld-badge">เส้นทางประมาณ</span>
+                <button class="ld-text-action" type="button" data-action="recalculate-plan">คำนวณใหม่ ↻</button>
+              </div>
+            </div>
+            <div class="ld-map-art">
+              <!-- DISPATCH_MAP -->
+            </div>
+            <div class="ld-map-legend" aria-label="สีเส้นทางไรเดอร์">
+              <span><i class="ld-dot ld-dot--coral" aria-hidden="true"></i>ไรเดอร์ 01</span>
+              <span><i class="ld-dot ld-dot--purple" aria-hidden="true"></i>ไรเดอร์ 02</span>
+              <span><i class="ld-dot ld-dot--blue" aria-hidden="true"></i>ไรเดอร์ 03</span>
+              <span><i class="ld-dot ld-dot--green" aria-hidden="true"></i>ไรเดอร์ 04</span>
+            </div>
+          </section>
+
+          <section class="ld-rider-jobs" aria-labelledby="ld-jobs-heading">
+            <div class="ld-jobs-heading"><h2 id="ld-jobs-heading">ใบงานไรเดอร์</h2><span>10 คน</span></div>
+            <!-- TODO: ใช้ delivery_jobs จากแผนที่เลือก; ยังไม่เรียก API -->
+            <label class="card ld-job is-active" for="ld-nav-rider" data-job-code="TW-1001">
+              <strong>● ไรเดอร์ 01 · TW-1001</strong><span>3 ออเดอร์ · 6 กล่อง · 3.4 กม.</span><small>ส่งเสร็จ 11:48 · ฿55.80</small>
+            </label>
+            <button class="card ld-job" type="button" data-action="open-job" data-job-code="TW-1002"><strong>● ไรเดอร์ 02 · TW-1002</strong><span>3 ออเดอร์ · 5 กล่อง · 2.8 กม.</span><small>ส่งเสร็จ 11:44 · ฿43.00</small></button>
+            <button class="card ld-job" type="button" data-action="open-job" data-job-code="TW-1003"><strong>● ไรเดอร์ 03 · TW-1003</strong><span>2 ออเดอร์ · 4 กล่อง · 3.1 กม.</span><small>ส่งเสร็จ 11:45 · ฿39.80</small></button>
+            <button class="card ld-job" type="button" data-action="open-job" data-job-code="TW-1004"><strong>● ไรเดอร์ 04 · TW-1004</strong><span>3 ออเดอร์ · 6 กล่อง · 2.6 กม.</span><small>ส่งเสร็จ 11:43 · ฿46.20</small></button>
+            <button class="card ld-job" type="button" data-action="open-job" data-job-code="TW-1005"><strong>● ไรเดอร์ 05 · TW-1005</strong><span>2 ออเดอร์ · 4 กล่อง · 2.5 กม.</span><small>ส่งเสร็จ 11:42 · ฿35.00</small></button>
+            <button class="card ld-job" type="button" data-action="open-job" data-job-code="TW-1006"><strong>● ไรเดอร์ 06 · TW-1006</strong><span>3 ออเดอร์ · 6 กล่อง · 3.0 กม.</span><small>ส่งเสร็จ 11:47 · ฿51.00</small></button>
+            <label class="ld-all-jobs" for="ld-nav-rider">ดูใบงานทั้งหมด 10 ใบ →</label>
+          </section>
+        </div>
+
+        <section class="card ld-cost-summary" aria-label="ค่าใช้จ่ายและเวลาจัดส่ง">
+          <div><p>รายได้ทั้งหมด</p><strong>฿3,120</strong></div>
+          <div><p>ต้นทุนอาหาร</p><strong>฿1,920</strong></div>
+          <div><p>ค่าจัดส่งประมาณ</p><strong>฿400</strong></div>
+          <div><p>คาดว่าส่งครบ</p><strong class="ld-positive">11:55 น.</strong></div>
+          <button class="btn ld-primary" type="button" data-action="confirm-plan">ยืนยันแผนนี้</button>
+        </section>
+      </section>

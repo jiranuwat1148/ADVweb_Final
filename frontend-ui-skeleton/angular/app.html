@@ -1,0 +1,530 @@
+<!-- โครงหน้าจอเท่านั้น: เปลี่ยนหน้าได้ด้วย radio + CSS; เพื่อนเชื่อม Angular Router/API ภายหลัง -->
+<div class="ld-app" data-theme="lunch">
+  <input class="ld-view-toggle" type="radio" name="ld-page" id="ld-nav-overview" aria-label="ภาพรวมการจัดส่ง" checked>
+  <input class="ld-view-toggle" type="radio" name="ld-page" id="ld-nav-orders" aria-label="ออเดอร์">
+  <input class="ld-view-toggle" type="radio" name="ld-page" id="ld-nav-customers" aria-label="ลูกค้า">
+  <input class="ld-view-toggle" type="radio" name="ld-page" id="ld-nav-rider" aria-label="ใบงานไรเดอร์">
+
+  <div class="ld-shell">
+    <aside class="ld-sidebar" aria-label="เมนูจัดการร้าน">
+      <label class="ld-brand" for="ld-nav-overview">
+        <span class="ld-brand-mark" aria-hidden="true">ท</span>
+        <span class="ld-brand-copy"><strong>เที่ยงไว</strong><span>Lunch Dispatch</span></span>
+      </label>
+      <p class="ld-sidebar-label">จัดการร้านของคุณ</p>
+      <nav class="ld-navigation" aria-label="เลือกหน้าจอ">
+        <label class="ld-nav-item" for="ld-nav-overview">ภาพรวมการจัดส่ง</label>
+        <label class="ld-nav-item" for="ld-nav-orders">ออเดอร์</label>
+        <label class="ld-nav-item" for="ld-nav-customers">ลูกค้า</label>
+        <label class="ld-nav-item" for="ld-nav-rider">ใบงานไรเดอร์</label>
+      </nav>
+      <div class="ld-sidebar-spacer" aria-hidden="true"></div>
+      <div class="card ld-lunch-window">
+        <strong>รอบมื้อเที่ยง</strong>
+        <span>11:30 → 12:30</span>
+        <p>ส่งให้ทัน ทุกมื้อมีความสุข</p>
+      </div>
+      <p class="ld-system-status"><span aria-hidden="true">●</span> ระบบพร้อมใช้งาน</p>
+    </aside>
+
+    <main class="ld-content">
+
+      <section class="ld-page ld-page--overview" id="ld-page-overview" aria-labelledby="ld-overview-heading">
+        <header class="ld-header">
+          <div class="ld-heading">
+            <h1 id="ld-overview-heading">จัดส่งมื้อเที่ยงให้ทันเวลา</h1>
+            <p>พฤหัสบดี 1 ตุลาคม 2569 · รอบจัดส่ง 11:30 น.</p>
+          </div>
+          <div class="ld-header-actions">
+            <span class="badge ld-badge">ข้อมูลจำลอง</span>
+            <button class="btn ld-primary" type="button" data-action="create-plan">สร้างแผนจัดส่ง</button>
+          </div>
+        </header>
+
+        <!-- TODO: สรุปตัวเลขจาก orders และผลคำนวณของทีมจัดเส้นทาง -->
+        <div class="ld-stats" aria-label="สรุปการจัดส่ง">
+          <article class="card ld-stat"><h2 class="ld-stat-label">ออเดอร์วันนี้</h2><p class="ld-stat-number">24</p><p class="ld-stat-note">พร้อมจัดส่งทั้งหมด</p></article>
+          <article class="card ld-stat"><h2 class="ld-stat-label">ข้าวกล่อง</h2><p class="ld-stat-number">48</p><p class="ld-stat-note">เฉลี่ย 2 กล่อง / ออเดอร์</p></article>
+          <article class="card ld-stat"><h2 class="ld-stat-label">ไรเดอร์ที่ใช้</h2><p class="ld-stat-number">10</p><p class="ld-stat-note">ไม่เกิน 3 ออเดอร์ / คน</p></article>
+          <article class="card ld-stat ld-stat--soft"><h2 class="ld-stat-label">กำไรประมาณการ</h2><p class="ld-stat-number"><span class="ld-currency">฿</span>800</p><p class="ld-stat-note">ก่อนค่าใช้จ่ายอื่น</p></article>
+        </div>
+
+        <div class="ld-dispatch-grid">
+          <section class="card ld-map-card" aria-labelledby="ld-map-heading">
+            <div class="ld-map-toolbar">
+              <h2 id="ld-map-heading">แผนเส้นทางจัดส่ง</h2>
+              <div class="ld-map-controls">
+                <span class="badge ld-badge">เส้นทางประมาณ</span>
+                <button class="ld-text-action" type="button" data-action="recalculate-plan">คำนวณใหม่ ↻</button>
+              </div>
+            </div>
+            <div class="ld-map-art">
+              <svg xmlns="http://www.w3.org/2000/svg" width="806" height="544" viewBox="0 0 806 544" role="img" aria-labelledby="ld-dispatch-map-title ld-dispatch-map-desc" style="font-family: inherit;">
+  <title id="ld-dispatch-map-title">แผนเส้นทางจัดส่งมื้อเที่ยง</title>
+  <desc id="ld-dispatch-map-desc">แผนที่ตัวอย่างแสดงร้านเที่ยงไว ถนนและพื้นที่มหาวิทยาลัย พร้อมเส้นทางไรเดอร์สี่สี สีละสามจุดส่ง</desc>
+  <defs>
+    <clipPath id="ld-dispatch-map-clip">
+      <rect width="806" height="544" />
+    </clipPath>
+  </defs>
+  <g clip-path="url(#ld-dispatch-map-clip)">
+    <rect width="806" height="544" fill="#F6F8F5" />
+    <g fill="#EAF3ED">
+      <rect x="65" y="24" width="210" height="100" rx="20" />
+      <rect x="440" y="240" width="170" height="92" rx="24" />
+    </g>
+    <rect x="320" y="90" width="124" height="78" rx="10" fill="#E4E9E3" />
+    <rect x="706" y="0" width="100" height="544" fill="#EAF3ED" />
+    <g fill="none" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M0 80 L250 80 L320 160 L796 160" />
+      <path d="M60 0 L60 310 L796 310" />
+      <path d="M200 0 L200 200 L460 200 L600 392" />
+      <path d="M450 0 L450 280 L300 392" />
+      <path d="M0 255 L110 255 L250 390" />
+      <path d="M620 0 L620 110 L760 220" />
+      <path d="M0 350 L796 350" />
+      <path d="M330 0 L330 80" />
+      <path d="M500 160 L500 0" />
+    </g>
+    <g fill="none" stroke="#E4E9E3" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M0 80 L250 80 L320 160 L796 160" />
+      <path d="M60 0 L60 310 L796 310" />
+      <path d="M200 0 L200 200 L460 200 L600 392" />
+      <path d="M450 0 L450 280 L300 392" />
+      <path d="M0 255 L110 255 L250 390" />
+      <path d="M620 0 L620 110 L760 220" />
+      <path d="M0 350 L796 350" />
+      <path d="M330 0 L330 80" />
+      <path d="M500 160 L500 0" />
+    </g>
+    <g fill="#7D8D82" font-size="12" font-weight="500">
+      <text x="79" y="69">มหาวิทยาลัยมหาสารคาม</text>
+      <text x="312" y="183">ถนนขามเรียง</text>
+      <text x="469" y="275">โซนหอพัก</text>
+      <text x="616" y="113">ท่าขอนยาง</text>
+    </g>
+    <g fill="none" stroke="#D97058" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M344 290 L344 200 L200 200 L200 80 L100 80" />
+    </g>
+    <g fill="#D97058" stroke="#FFFFFF" stroke-width="3">
+      <circle cx="200" cy="200" r="12.5" />
+      <circle cx="200" cy="80" r="12.5" />
+      <circle cx="100" cy="80" r="12.5" />
+    </g>
+    <g fill="#FFFFFF" font-size="12" font-weight="500" text-anchor="middle">
+      <text x="200" y="204">1</text>
+      <text x="200" y="84">2</text>
+      <text x="100" y="84">3</text>
+    </g>
+    <g fill="none" stroke="#8B75C9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M344 290 L450 290 L450 160 L570 160 L570 75" />
+    </g>
+    <g fill="#8B75C9" stroke="#FFFFFF" stroke-width="3">
+      <circle cx="450" cy="290" r="12.5" />
+      <circle cx="450" cy="160" r="12.5" />
+      <circle cx="570" cy="75" r="12.5" />
+    </g>
+    <g fill="#FFFFFF" font-size="12" font-weight="500" text-anchor="middle">
+      <text x="450" y="294">1</text>
+      <text x="450" y="164">2</text>
+      <text x="570" y="79">3</text>
+    </g>
+    <g fill="none" stroke="#5F91CB" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M344 290 L344 350 L620 350 L620 225 L710 225" />
+    </g>
+    <g fill="#5F91CB" stroke="#FFFFFF" stroke-width="3">
+      <circle cx="460" cy="350" r="12.5" />
+      <circle cx="620" cy="350" r="12.5" />
+      <circle cx="710" cy="225" r="12.5" />
+    </g>
+    <g fill="#FFFFFF" font-size="12" font-weight="500" text-anchor="middle">
+      <text x="460" y="354">1</text>
+      <text x="620" y="354">2</text>
+      <text x="710" y="229">3</text>
+    </g>
+    <g fill="none" stroke="#217A54" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M344 290 L200 290 L200 255 L65 255 L65 165" />
+    </g>
+    <g fill="#217A54" stroke="#FFFFFF" stroke-width="3">
+      <circle cx="200" cy="255" r="12.5" />
+      <circle cx="65" cy="255" r="12.5" />
+      <circle cx="65" cy="165" r="12.5" />
+    </g>
+    <g fill="#FFFFFF" font-size="12" font-weight="500" text-anchor="middle">
+      <text x="200" y="259">1</text>
+      <text x="65" y="259">2</text>
+      <text x="65" y="169">3</text>
+    </g>
+    <rect x="325" y="271" width="38" height="38" rx="12" fill="#163E32" />
+    <text x="344" y="295" fill="#FFFFFF" font-size="14" font-weight="600" text-anchor="middle">ท</text>
+    <rect x="307" y="313" width="74" height="36" fill="#FFFFFF" />
+    <text x="315" y="335" fill="#163E32" font-size="12" font-weight="500">ร้านเที่ยงไว</text>
+  </g>
+</svg>
+
+            </div>
+            <div class="ld-map-legend" aria-label="สีเส้นทางไรเดอร์">
+              <span><i class="ld-dot ld-dot--coral" aria-hidden="true"></i>ไรเดอร์ 01</span>
+              <span><i class="ld-dot ld-dot--purple" aria-hidden="true"></i>ไรเดอร์ 02</span>
+              <span><i class="ld-dot ld-dot--blue" aria-hidden="true"></i>ไรเดอร์ 03</span>
+              <span><i class="ld-dot ld-dot--green" aria-hidden="true"></i>ไรเดอร์ 04</span>
+            </div>
+          </section>
+
+          <section class="ld-rider-jobs" aria-labelledby="ld-jobs-heading">
+            <div class="ld-jobs-heading"><h2 id="ld-jobs-heading">ใบงานไรเดอร์</h2><span>10 คน</span></div>
+            <!-- TODO: ใช้ delivery_jobs จากแผนที่เลือก; ยังไม่เรียก API -->
+            <label class="card ld-job is-active" for="ld-nav-rider" data-job-code="TW-1001">
+              <strong>● ไรเดอร์ 01 · TW-1001</strong><span>3 ออเดอร์ · 6 กล่อง · 3.4 กม.</span><small>ส่งเสร็จ 11:48 · ฿55.80</small>
+            </label>
+            <button class="card ld-job" type="button" data-action="open-job" data-job-code="TW-1002"><strong>● ไรเดอร์ 02 · TW-1002</strong><span>3 ออเดอร์ · 5 กล่อง · 2.8 กม.</span><small>ส่งเสร็จ 11:44 · ฿43.00</small></button>
+            <button class="card ld-job" type="button" data-action="open-job" data-job-code="TW-1003"><strong>● ไรเดอร์ 03 · TW-1003</strong><span>2 ออเดอร์ · 4 กล่อง · 3.1 กม.</span><small>ส่งเสร็จ 11:45 · ฿39.80</small></button>
+            <button class="card ld-job" type="button" data-action="open-job" data-job-code="TW-1004"><strong>● ไรเดอร์ 04 · TW-1004</strong><span>3 ออเดอร์ · 6 กล่อง · 2.6 กม.</span><small>ส่งเสร็จ 11:43 · ฿46.20</small></button>
+            <button class="card ld-job" type="button" data-action="open-job" data-job-code="TW-1005"><strong>● ไรเดอร์ 05 · TW-1005</strong><span>2 ออเดอร์ · 4 กล่อง · 2.5 กม.</span><small>ส่งเสร็จ 11:42 · ฿35.00</small></button>
+            <button class="card ld-job" type="button" data-action="open-job" data-job-code="TW-1006"><strong>● ไรเดอร์ 06 · TW-1006</strong><span>3 ออเดอร์ · 6 กล่อง · 3.0 กม.</span><small>ส่งเสร็จ 11:47 · ฿51.00</small></button>
+            <label class="ld-all-jobs" for="ld-nav-rider">ดูใบงานทั้งหมด 10 ใบ →</label>
+          </section>
+        </div>
+
+        <section class="card ld-cost-summary" aria-label="ค่าใช้จ่ายและเวลาจัดส่ง">
+          <div><p>รายได้ทั้งหมด</p><strong>฿3,120</strong></div>
+          <div><p>ต้นทุนอาหาร</p><strong>฿1,920</strong></div>
+          <div><p>ค่าจัดส่งประมาณ</p><strong>฿400</strong></div>
+          <div><p>คาดว่าส่งครบ</p><strong class="ld-positive">11:55 น.</strong></div>
+          <button class="btn ld-primary" type="button" data-action="confirm-plan">ยืนยันแผนนี้</button>
+        </section>
+      </section>
+
+
+<section class="ld-page ld-page--orders" id="ld-page-orders" aria-labelledby="ld-orders-heading">
+  <header class="ld-header">
+    <div class="ld-heading">
+      <h1 id="ld-orders-heading">ออเดอร์มื้อเที่ยง</h1>
+      <p>จัดการรายการสั่งซื้อก่อนออกส่ง · 24 ออเดอร์วันนี้</p>
+    </div>
+    <div class="ld-header-actions">
+      <span class="badge ld-badge">ข้อมูลจำลอง</span>
+      <!-- TODO: เชื่อมปุ่มเพิ่มออเดอร์กับฟอร์มและ POST /api/orders ภายหลัง -->
+      <button class="btn ld-primary" type="button" data-action="add-order">เพิ่มออเดอร์</button>
+    </div>
+  </header>
+
+  <!-- TODO: แทนค่าตัวอย่างด้วยสรุปออเดอร์ของวันที่เลือกจาก backend -->
+  <div class="ld-stats">
+    <article class="card ld-stat">
+      <p class="ld-stat-label">ออเดอร์ทั้งหมด</p>
+      <p class="ld-stat-number">24</p>
+      <p class="ld-stat-note">ข้อมูลจำลองสำหรับทดสอบ</p>
+    </article>
+    <article class="card ld-stat">
+      <p class="ld-stat-label">จำนวนกล่อง</p>
+      <p class="ld-stat-number">48</p>
+      <p class="ld-stat-note">1–3 กล่องต่อออเดอร์</p>
+    </article>
+    <article class="card ld-stat">
+      <p class="ld-stat-label">พร้อมจัดส่ง</p>
+      <p class="ld-stat-number">24</p>
+      <p class="ld-stat-note">ยังไม่ยืนยันใบงาน</p>
+    </article>
+    <article class="card ld-stat ld-stat--soft">
+      <p class="ld-stat-label">รายได้รวม</p>
+      <p class="ld-stat-number"><span class="ld-currency">฿</span>3,120</p>
+      <p class="ld-stat-note">ราคากล่องละ 65 บาท</p>
+    </article>
+  </div>
+
+  <!-- TODO: เชื่อมการค้นหา ตัวกรอง และ POST /api/orders/simulate ภายหลัง -->
+  <div class="ld-order-filters">
+    <input class="input ld-search" type="search" name="order-search" aria-label="ค้นหาเลขออเดอร์หรือชื่อลูกค้า" placeholder="ค้นหาเลขออเดอร์หรือชื่อลูกค้า" data-action="search-orders">
+    <button class="badge ld-badge" type="button" data-action="filter-orders" data-filter="all" aria-pressed="true">ทั้งหมด 24</button>
+    <button class="badge ld-badge" type="button" data-action="filter-orders" data-filter="pending" aria-pressed="false">พร้อมจัดส่ง</button>
+    <button class="btn ld-secondary" type="button" data-action="simulate-orders" data-count="24">จำลอง 24 ออเดอร์</button>
+  </div>
+
+  <!-- TODO: แทนแถวตัวอย่างด้วย GET /api/orders; เชื่อมแก้ไขและลบตาม data-order-id -->
+  <div class="card ld-table-card">
+    <table class="table ld-orders-table" aria-label="ออเดอร์มื้อเที่ยง">
+      <thead>
+        <tr>
+          <th scope="col">เลขออเดอร์</th>
+          <th scope="col">ลูกค้า</th>
+          <th scope="col">จำนวน</th>
+          <th scope="col">ยอดรวม</th>
+          <th scope="col">สถานะ</th>
+          <th scope="col">จัดการ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-order-id="1">
+          <td>ORD-001</td>
+          <td>กมลชนก ใจดี</td>
+          <td>2 กล่อง</td>
+          <td><span class="ld-currency">฿</span>130</td>
+          <td><span class="ld-inline-status"><span aria-hidden="true">●</span> พร้อมจัดส่ง</span></td>
+          <td><div class="ld-table-actions"><button class="ld-text-action" type="button" data-action="edit-order" data-order-id="1" aria-label="แก้ไขออเดอร์ ORD-001">แก้ไข</button><span aria-hidden="true">·</span><button class="ld-text-action" type="button" data-action="delete-order" data-order-id="1" aria-label="ลบออเดอร์ ORD-001">ลบ</button></div></td>
+        </tr>
+        <tr data-order-id="2">
+          <td>ORD-002</td>
+          <td>พิมพ์ชนก แก้วใส</td>
+          <td>3 กล่อง</td>
+          <td><span class="ld-currency">฿</span>195</td>
+          <td><span class="ld-inline-status"><span aria-hidden="true">●</span> พร้อมจัดส่ง</span></td>
+          <td><div class="ld-table-actions"><button class="ld-text-action" type="button" data-action="edit-order" data-order-id="2" aria-label="แก้ไขออเดอร์ ORD-002">แก้ไข</button><span aria-hidden="true">·</span><button class="ld-text-action" type="button" data-action="delete-order" data-order-id="2" aria-label="ลบออเดอร์ ORD-002">ลบ</button></div></td>
+        </tr>
+        <tr data-order-id="3">
+          <td>ORD-003</td>
+          <td>ธนกฤต พรมมา</td>
+          <td>1 กล่อง</td>
+          <td><span class="ld-currency">฿</span>65</td>
+          <td><span class="ld-inline-status"><span aria-hidden="true">●</span> พร้อมจัดส่ง</span></td>
+          <td><div class="ld-table-actions"><button class="ld-text-action" type="button" data-action="edit-order" data-order-id="3" aria-label="แก้ไขออเดอร์ ORD-003">แก้ไข</button><span aria-hidden="true">·</span><button class="ld-text-action" type="button" data-action="delete-order" data-order-id="3" aria-label="ลบออเดอร์ ORD-003">ลบ</button></div></td>
+        </tr>
+        <tr data-order-id="4">
+          <td>ORD-004</td>
+          <td>สุธิดา รุ่งเรือง</td>
+          <td>2 กล่อง</td>
+          <td><span class="ld-currency">฿</span>130</td>
+          <td><span class="ld-inline-status"><span aria-hidden="true">●</span> พร้อมจัดส่ง</span></td>
+          <td><div class="ld-table-actions"><button class="ld-text-action" type="button" data-action="edit-order" data-order-id="4" aria-label="แก้ไขออเดอร์ ORD-004">แก้ไข</button><span aria-hidden="true">·</span><button class="ld-text-action" type="button" data-action="delete-order" data-order-id="4" aria-label="ลบออเดอร์ ORD-004">ลบ</button></div></td>
+        </tr>
+        <tr data-order-id="5">
+          <td>ORD-005</td>
+          <td>ณัฐวุฒิ บุญมี</td>
+          <td>3 กล่อง</td>
+          <td><span class="ld-currency">฿</span>195</td>
+          <td><span class="ld-inline-status"><span aria-hidden="true">●</span> พร้อมจัดส่ง</span></td>
+          <td><div class="ld-table-actions"><button class="ld-text-action" type="button" data-action="edit-order" data-order-id="5" aria-label="แก้ไขออเดอร์ ORD-005">แก้ไข</button><span aria-hidden="true">·</span><button class="ld-text-action" type="button" data-action="delete-order" data-order-id="5" aria-label="ลบออเดอร์ ORD-005">ลบ</button></div></td>
+        </tr>
+        <tr data-order-id="6">
+          <td>ORD-006</td>
+          <td>ปวีณา คำสุข</td>
+          <td>2 กล่อง</td>
+          <td><span class="ld-currency">฿</span>130</td>
+          <td><span class="ld-inline-status"><span aria-hidden="true">●</span> พร้อมจัดส่ง</span></td>
+          <td><div class="ld-table-actions"><button class="ld-text-action" type="button" data-action="edit-order" data-order-id="6" aria-label="แก้ไขออเดอร์ ORD-006">แก้ไข</button><span aria-hidden="true">·</span><button class="ld-text-action" type="button" data-action="delete-order" data-order-id="6" aria-label="ลบออเดอร์ ORD-006">ลบ</button></div></td>
+        </tr>
+        <tr data-order-id="7">
+          <td>ORD-007</td>
+          <td>วราภรณ์ ศรีไทย</td>
+          <td>1 กล่อง</td>
+          <td><span class="ld-currency">฿</span>65</td>
+          <td><span class="ld-inline-status"><span aria-hidden="true">●</span> พร้อมจัดส่ง</span></td>
+          <td><div class="ld-table-actions"><button class="ld-text-action" type="button" data-action="edit-order" data-order-id="7" aria-label="แก้ไขออเดอร์ ORD-007">แก้ไข</button><span aria-hidden="true">·</span><button class="ld-text-action" type="button" data-action="delete-order" data-order-id="7" aria-label="ลบออเดอร์ ORD-007">ลบ</button></div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="ld-rule-note">ตรวจสอบจำนวนกล่องและพิกัดลูกค้าให้ครบ ก่อนสร้างแผนจัดส่ง</p>
+</section>
+
+
+<section class="ld-page ld-page--customers" id="ld-page-customers" aria-labelledby="ld-customers-heading">
+  <header class="ld-header">
+    <div class="ld-heading">
+      <h1 id="ld-customers-heading">ลูกค้าและพิกัดจัดส่ง</h1>
+      <p>บันทึกข้อมูลลูกค้าในรัศมี 3 กิโลเมตรจากร้าน</p>
+    </div>
+    <div class="ld-header-actions">
+      <span class="badge ld-badge">ข้อมูลจำลอง</span>
+      <!-- TODO: เชื่อมปุ่มเพิ่มลูกค้ากับฟอร์มและ POST /api/customers ภายหลัง -->
+      <button class="btn ld-primary" type="button" data-action="add-customer">เพิ่มลูกค้า</button>
+    </div>
+  </header>
+
+  <div class="ld-customers-grid">
+    <div class="ld-customer-list-column">
+      <!-- TODO: เชื่อมการค้นหาและแทนข้อมูลตัวอย่างด้วย GET /api/customers -->
+      <input class="input ld-search" type="search" name="customer-search" aria-label="ค้นหาชื่อหรือเบอร์โทร" placeholder="ค้นหาชื่อหรือเบอร์โทร" data-action="search-customers">
+      <div class="card ld-customer-list" aria-label="รายชื่อลูกค้า">
+        <!-- TODO: เลือกลูกค้าตาม data-customer-id แล้วอัปเดตข้อมูลและพิกัดด้านขวา -->
+        <button class="ld-customer-row is-active" type="button" data-action="select-customer" data-customer-id="1" aria-pressed="true">
+          <span class="ld-avatar" aria-hidden="true">ก</span>
+          <span class="ld-customer-data"><strong>กมลชนก ใจดี</strong><small>081-234-5600 · หอพักใกล้มหาวิทยาลัย</small></span>
+          <span aria-hidden="true">→</span>
+        </button>
+        <button class="ld-customer-row" type="button" data-action="select-customer" data-customer-id="2" aria-pressed="false">
+          <span class="ld-avatar" aria-hidden="true">พ</span>
+          <span class="ld-customer-data"><strong>พิมพ์ชนก แก้วใส</strong><small>082-234-5601 · หอพักใกล้มหาวิทยาลัย</small></span>
+          <span aria-hidden="true">→</span>
+        </button>
+        <button class="ld-customer-row" type="button" data-action="select-customer" data-customer-id="3" aria-pressed="false">
+          <span class="ld-avatar" aria-hidden="true">ธ</span>
+          <span class="ld-customer-data"><strong>ธนกฤต พรมมา</strong><small>083-234-5602 · หอพักใกล้มหาวิทยาลัย</small></span>
+          <span aria-hidden="true">→</span>
+        </button>
+        <button class="ld-customer-row" type="button" data-action="select-customer" data-customer-id="4" aria-pressed="false">
+          <span class="ld-avatar" aria-hidden="true">ส</span>
+          <span class="ld-customer-data"><strong>สุธิดา รุ่งเรือง</strong><small>084-234-5603 · หอพักใกล้มหาวิทยาลัย</small></span>
+          <span aria-hidden="true">→</span>
+        </button>
+        <button class="ld-customer-row" type="button" data-action="select-customer" data-customer-id="5" aria-pressed="false">
+          <span class="ld-avatar" aria-hidden="true">ณ</span>
+          <span class="ld-customer-data"><strong>ณัฐวุฒิ บุญมี</strong><small>085-234-5604 · หอพักใกล้มหาวิทยาลัย</small></span>
+          <span aria-hidden="true">→</span>
+        </button>
+        <button class="ld-customer-row" type="button" data-action="select-customer" data-customer-id="6" aria-pressed="false">
+          <span class="ld-avatar" aria-hidden="true">ป</span>
+          <span class="ld-customer-data"><strong>ปวีณา คำสุข</strong><small>086-234-5605 · หอพักใกล้มหาวิทยาลัย</small></span>
+          <span aria-hidden="true">→</span>
+        </button>
+        <button class="ld-customer-row" type="button" data-action="select-customer" data-customer-id="7" aria-pressed="false">
+          <span class="ld-avatar" aria-hidden="true">ว</span>
+          <span class="ld-customer-data"><strong>วราภรณ์ ศรีไทย</strong><small>087-234-5606 · หอพักใกล้มหาวิทยาลัย</small></span>
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
+      <p class="ld-customer-count">ลูกค้าทั้งหมด 24 คน · เลือกเพื่อดูตำแหน่งบ้าน</p>
+    </div>
+
+    <!-- TODO: แทนข้อมูลนี้ด้วยลูกค้าที่เลือก โดยใช้พิกัดจาก backend -->
+    <article class="card ld-customer-detail" aria-labelledby="ld-customer-detail-heading" data-customer-id="1">
+      <h2 id="ld-customer-detail-heading">กมลชนก ใจดี</h2>
+      <p class="ld-detail-subtitle">081-234-5600 · หอพักบ้านสวน ห้อง 302</p>
+      <div class="ld-customer-map">
+        <svg xmlns="http://www.w3.org/2000/svg" width="504" height="380" viewBox="0 0 504 380" role="img" aria-labelledby="ld-customer-map-title ld-customer-map-desc" style="font-family: inherit;">
+  <title id="ld-customer-map-title">ตำแหน่งบ้านลูกค้าและร้านเที่ยงไว</title>
+  <desc id="ld-customer-map-desc">แผนที่ตัวอย่างแสดงบ้านลูกค้าที่เลือกด้วยหมุดสีเขียวและอักษร ก พร้อมร้านเที่ยงไวและถนนโดยรอบมหาวิทยาลัย</desc>
+  <defs>
+    <clipPath id="ld-customer-map-clip">
+      <rect width="504" height="380" />
+    </clipPath>
+  </defs>
+  <g clip-path="url(#ld-customer-map-clip)">
+    <rect width="504" height="380" fill="#F6F8F5" />
+    <g fill="#EAF3ED">
+      <rect x="65" y="24" width="210" height="100" rx="20" />
+      <rect x="440" y="240" width="170" height="92" rx="24" />
+    </g>
+    <rect x="320" y="90" width="124" height="78" rx="10" fill="#E4E9E3" />
+    <rect x="404" y="0" width="100" height="330" fill="#EAF3ED" />
+    <g fill="none" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M0 80 L250 80 L320 160 L796 160" />
+      <path d="M60 0 L60 310 L796 310" />
+      <path d="M200 0 L200 200 L460 200 L600 392" />
+      <path d="M450 0 L450 280 L300 392" />
+      <path d="M0 255 L110 255 L250 390" />
+      <path d="M620 0 L620 110 L760 220" />
+      <path d="M0 350 L796 350" />
+      <path d="M330 0 L330 80" />
+      <path d="M500 160 L500 0" />
+    </g>
+    <g fill="none" stroke="#E4E9E3" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M0 80 L250 80 L320 160 L796 160" />
+      <path d="M60 0 L60 310 L796 310" />
+      <path d="M200 0 L200 200 L460 200 L600 392" />
+      <path d="M450 0 L450 280 L300 392" />
+      <path d="M0 255 L110 255 L250 390" />
+      <path d="M620 0 L620 110 L760 220" />
+      <path d="M0 350 L796 350" />
+      <path d="M330 0 L330 80" />
+      <path d="M500 160 L500 0" />
+    </g>
+    <g fill="#7D8D82" font-size="12" font-weight="500">
+      <text x="79" y="69">มหาวิทยาลัยมหาสารคาม</text>
+      <text x="312" y="183">ถนนขามเรียง</text>
+      <text x="469" y="275">โซนหอพัก</text>
+      <text x="616" y="113">ท่าขอนยาง</text>
+    </g>
+    <rect x="325" y="271" width="38" height="38" rx="12" fill="#163E32" />
+    <text x="344" y="295" fill="#FFFFFF" font-size="14" font-weight="600" text-anchor="middle">ท</text>
+    <rect x="307" y="313" width="74" height="36" fill="#FFFFFF" />
+    <text x="315" y="335" fill="#163E32" font-size="12" font-weight="500">ร้านเที่ยงไว</text>
+    <circle cx="202" cy="201" r="16" fill="#217A54" />
+    <text x="202" y="206" fill="#FFFFFF" font-size="14" font-weight="600" text-anchor="middle">ก</text>
+    <text x="177" y="239" fill="#217A54" font-size="12" font-weight="500">บ้านลูกค้า</text>
+  </g>
+</svg>
+
+      </div>
+      <div class="ld-location-fields">
+        <h3>ตำแหน่งที่บันทึก</h3>
+        <p>ละติจูด 16.2504 · ลองจิจูด 103.2458</p>
+        <p class="ld-location-distance">ระยะห่างจากร้านประมาณ 1.2 กิโลเมตร</p>
+        <p>หมายเหตุ: โทรก่อนถึง 5 นาที</p>
+      </div>
+      <!-- TODO: เชื่อมแก้ไขกับ PUT /api/customers/:id และเปิดแผนที่จากพิกัดลูกค้า -->
+      <div class="ld-customer-actions">
+        <button class="btn ld-primary" type="button" data-action="edit-customer" data-customer-id="1">แก้ไขข้อมูล</button>
+        <button class="btn ld-secondary" type="button" data-action="open-customer-map" data-customer-id="1" data-lat="16.2504" data-lng="103.2458">เปิดในแผนที่ ↗</button>
+      </div>
+      <p class="ld-map-note">แผนที่ตัวอย่างเพื่อแสดงรูปแบบหน้าจอ</p>
+    </article>
+  </div>
+</section>
+
+
+<section class="ld-page ld-page--rider" id="ld-page-rider" aria-labelledby="rider-title">
+  <div class="ld-rider">
+    <header class="ld-rider-header">
+      <label for="ld-nav-overview" class="ld-rider-brand" aria-label="กลับหน้าภาพรวม">เที่ยงไว</label>
+      <span class="badge ld-badge">ใบงานไรเดอร์</span>
+    </header>
+
+    <h1 id="rider-title">พร้อมออกส่งแล้ว</h1>
+    <p class="ld-rider-subtitle">ใบงาน TW-1001 &nbsp;·&nbsp; 1 ต.ค. 2569</p>
+
+    <!-- TODO: แทนข้อมูลจำลองด้วยใบงานจาก rider API หลังตรวจสอบเลขใบงานแล้ว -->
+    <div class="card ld-pickup">
+      <p class="ld-pickup-label">หยิบอาหารจากร้าน</p>
+      <div class="ld-pickup-count">
+        <strong>6</strong>
+        <span>กล่อง &nbsp;/&nbsp; 3 ออเดอร์</span>
+      </div>
+      <p class="ld-pickup-meta">ออกส่ง 11:30 น. &nbsp;·&nbsp; ส่งให้ครบก่อน 12:30 น.</p>
+    </div>
+
+    <h2 class="ld-stop-heading">ลำดับจุดส่งของคุณ</h2>
+    <ol class="ld-stops">
+      <li class="card ld-stop">
+        <span class="ld-stop-number" aria-hidden="true">1</span>
+        <div class="ld-stop-detail">
+          <h3>กมลชนก ใจดี</h3>
+          <p>หอพักบ้านสวน ห้อง 302</p>
+          <p class="ld-stop-meta">2 กล่อง · คาดว่าถึง 11:36 น.</p>
+          <div class="ld-stop-actions">
+            <button class="btn ld-primary" type="button" data-action="open-map" data-stop="1">เปิดแผนที่ ↗</button>
+            <button class="btn ld-secondary" type="button" data-action="call-customer" data-stop="1">โทร</button>
+          </div>
+        </div>
+      </li>
+
+      <li class="card ld-stop">
+        <span class="ld-stop-number" aria-hidden="true">2</span>
+        <div class="ld-stop-detail">
+          <h3>พิมพ์ชนก แก้วใส</h3>
+          <p>หอพักริมสวน อาคาร B</p>
+          <p class="ld-stop-meta">3 กล่อง · คาดว่าถึง 11:42 น.</p>
+          <div class="ld-stop-actions">
+            <button class="btn ld-primary" type="button" data-action="open-map" data-stop="2">เปิดแผนที่ ↗</button>
+            <button class="btn ld-secondary" type="button" data-action="call-customer" data-stop="2">โทร</button>
+          </div>
+        </div>
+      </li>
+
+      <li class="card ld-stop">
+        <span class="ld-stop-number" aria-hidden="true">3</span>
+        <div class="ld-stop-detail">
+          <h3>ธนกฤต พรมมา</h3>
+          <p>บ้านเลขที่ 45 ท่าขอนยาง</p>
+          <p class="ld-stop-meta">1 กล่อง · คาดว่าถึง 11:48 น.</p>
+          <div class="ld-stop-actions">
+            <button class="btn ld-primary" type="button" data-action="open-map" data-stop="3">เปิดแผนที่ ↗</button>
+            <button class="btn ld-secondary" type="button" data-action="call-customer" data-stop="3">โทร</button>
+          </div>
+        </div>
+      </li>
+    </ol>
+
+    <div class="ld-rider-note">
+      <p>ข้อมูลจำลอง · เวลาถึงเป็นค่าประมาณ</p>
+      <p>ตรวจสอบจำนวนอาหารก่อนออกจากร้าน</p>
+    </div>
+  </div>
+</section>
+
+      <!-- Angular RouterOutlet เดิม: ทีมสามารถย้ายมาแทนส่วน ld-page เมื่อแยก component -->
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

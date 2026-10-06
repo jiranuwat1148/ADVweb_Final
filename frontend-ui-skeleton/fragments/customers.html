@@ -1,0 +1,80 @@
+<section class="ld-page ld-page--customers" id="ld-page-customers" aria-labelledby="ld-customers-heading">
+  <header class="ld-header">
+    <div class="ld-heading">
+      <h1 id="ld-customers-heading">ลูกค้าและพิกัดจัดส่ง</h1>
+      <p>บันทึกข้อมูลลูกค้าในรัศมี 3 กิโลเมตรจากร้าน</p>
+    </div>
+    <div class="ld-header-actions">
+      <span class="badge ld-badge">ข้อมูลจำลอง</span>
+      <!-- TODO: เชื่อมปุ่มเพิ่มลูกค้ากับฟอร์มและ POST /api/customers ภายหลัง -->
+      <button class="btn ld-primary" type="button" data-action="add-customer">เพิ่มลูกค้า</button>
+    </div>
+  </header>
+
+  <div class="ld-customers-grid">
+    <div class="ld-customer-list-column">
+      <!-- TODO: เชื่อมการค้นหาและแทนข้อมูลตัวอย่างด้วย GET /api/customers -->
+      <input class="input ld-search" type="search" name="customer-search" aria-label="ค้นหาชื่อหรือเบอร์โทร" placeholder="ค้นหาชื่อหรือเบอร์โทร" data-action="search-customers">
+      <div class="card ld-customer-list" aria-label="รายชื่อลูกค้า">
+        <!-- TODO: เลือกลูกค้าตาม data-customer-id แล้วอัปเดตข้อมูลและพิกัดด้านขวา -->
+        <button class="ld-customer-row is-active" type="button" data-action="select-customer" data-customer-id="1" aria-pressed="true">
+          <span class="ld-avatar" aria-hidden="true">ก</span>
+          <span class="ld-customer-data"><strong>กมลชนก ใจดี</strong><small>081-234-5600 · หอพักใกล้มหาวิทยาลัย</small></span>
+          <span aria-hidden="true">→</span>
+        </button>
+        <button class="ld-customer-row" type="button" data-action="select-customer" data-customer-id="2" aria-pressed="false">
+          <span class="ld-avatar" aria-hidden="true">พ</span>
+          <span class="ld-customer-data"><strong>พิมพ์ชนก แก้วใส</strong><small>082-234-5601 · หอพักใกล้มหาวิทยาลัย</small></span>
+          <span aria-hidden="true">→</span>
+        </button>
+        <button class="ld-customer-row" type="button" data-action="select-customer" data-customer-id="3" aria-pressed="false">
+          <span class="ld-avatar" aria-hidden="true">ธ</span>
+          <span class="ld-customer-data"><strong>ธนกฤต พรมมา</strong><small>083-234-5602 · หอพักใกล้มหาวิทยาลัย</small></span>
+          <span aria-hidden="true">→</span>
+        </button>
+        <button class="ld-customer-row" type="button" data-action="select-customer" data-customer-id="4" aria-pressed="false">
+          <span class="ld-avatar" aria-hidden="true">ส</span>
+          <span class="ld-customer-data"><strong>สุธิดา รุ่งเรือง</strong><small>084-234-5603 · หอพักใกล้มหาวิทยาลัย</small></span>
+          <span aria-hidden="true">→</span>
+        </button>
+        <button class="ld-customer-row" type="button" data-action="select-customer" data-customer-id="5" aria-pressed="false">
+          <span class="ld-avatar" aria-hidden="true">ณ</span>
+          <span class="ld-customer-data"><strong>ณัฐวุฒิ บุญมี</strong><small>085-234-5604 · หอพักใกล้มหาวิทยาลัย</small></span>
+          <span aria-hidden="true">→</span>
+        </button>
+        <button class="ld-customer-row" type="button" data-action="select-customer" data-customer-id="6" aria-pressed="false">
+          <span class="ld-avatar" aria-hidden="true">ป</span>
+          <span class="ld-customer-data"><strong>ปวีณา คำสุข</strong><small>086-234-5605 · หอพักใกล้มหาวิทยาลัย</small></span>
+          <span aria-hidden="true">→</span>
+        </button>
+        <button class="ld-customer-row" type="button" data-action="select-customer" data-customer-id="7" aria-pressed="false">
+          <span class="ld-avatar" aria-hidden="true">ว</span>
+          <span class="ld-customer-data"><strong>วราภรณ์ ศรีไทย</strong><small>087-234-5606 · หอพักใกล้มหาวิทยาลัย</small></span>
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
+      <p class="ld-customer-count">ลูกค้าทั้งหมด 24 คน · เลือกเพื่อดูตำแหน่งบ้าน</p>
+    </div>
+
+    <!-- TODO: แทนข้อมูลนี้ด้วยลูกค้าที่เลือก โดยใช้พิกัดจาก backend -->
+    <article class="card ld-customer-detail" aria-labelledby="ld-customer-detail-heading" data-customer-id="1">
+      <h2 id="ld-customer-detail-heading">กมลชนก ใจดี</h2>
+      <p class="ld-detail-subtitle">081-234-5600 · หอพักบ้านสวน ห้อง 302</p>
+      <div class="ld-customer-map">
+        <!-- CUSTOMER_MAP -->
+      </div>
+      <div class="ld-location-fields">
+        <h3>ตำแหน่งที่บันทึก</h3>
+        <p>ละติจูด 16.2504 · ลองจิจูด 103.2458</p>
+        <p class="ld-location-distance">ระยะห่างจากร้านประมาณ 1.2 กิโลเมตร</p>
+        <p>หมายเหตุ: โทรก่อนถึง 5 นาที</p>
+      </div>
+      <!-- TODO: เชื่อมแก้ไขกับ PUT /api/customers/:id และเปิดแผนที่จากพิกัดลูกค้า -->
+      <div class="ld-customer-actions">
+        <button class="btn ld-primary" type="button" data-action="edit-customer" data-customer-id="1">แก้ไขข้อมูล</button>
+        <button class="btn ld-secondary" type="button" data-action="open-customer-map" data-customer-id="1" data-lat="16.2504" data-lng="103.2458">เปิดในแผนที่ ↗</button>
+      </div>
+      <p class="ld-map-note">แผนที่ตัวอย่างเพื่อแสดงรูปแบบหน้าจอ</p>
+    </article>
+  </div>
+</section>

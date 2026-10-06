@@ -1,0 +1,12 @@
+:host { display: block; min-width: 0; }
+.ld-page--customers { display: flex; flex-direction: column; gap: 20px; }
+.ld-customer-list { max-height: 636px; overflow-y: auto; }
+.ld-customer-row { flex-shrink: 0; }
+.ld-customer-data > small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ld-customer-map > svg { width: 100%; }
+.ld-detail-subtitle { overflow-wrap: anywhere; }
+.ld-delete-customer { align-self: flex-start; color: var(--ld-coral); }
+fieldset.ld-form-grid { margin: 0; padding: 0; border: 0; }
+textarea.ld-input { font: inherit; resize: vertical; min-height: 88px; }
+button:disabled { cursor: wait; opacity: .6; }
+.ld-customer-list .ld-empty { display: flex; flex-direction: column; gap: 16px; align-items: flex-start; }

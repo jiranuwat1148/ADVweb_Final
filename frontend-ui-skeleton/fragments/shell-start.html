@@ -1,0 +1,30 @@
+<!-- โครงหน้าจอเท่านั้น: เปลี่ยนหน้าได้ด้วย radio + CSS; เพื่อนเชื่อม Angular Router/API ภายหลัง -->
+<div class="ld-app" data-theme="lunch">
+  <input class="ld-view-toggle" type="radio" name="ld-page" id="ld-nav-overview" aria-label="ภาพรวมการจัดส่ง" checked>
+  <input class="ld-view-toggle" type="radio" name="ld-page" id="ld-nav-orders" aria-label="ออเดอร์">
+  <input class="ld-view-toggle" type="radio" name="ld-page" id="ld-nav-customers" aria-label="ลูกค้า">
+  <input class="ld-view-toggle" type="radio" name="ld-page" id="ld-nav-rider" aria-label="ใบงานไรเดอร์">
+
+  <div class="ld-shell">
+    <aside class="ld-sidebar" aria-label="เมนูจัดการร้าน">
+      <label class="ld-brand" for="ld-nav-overview">
+        <span class="ld-brand-mark" aria-hidden="true">ท</span>
+        <span class="ld-brand-copy"><strong>เที่ยงไว</strong><span>Lunch Dispatch</span></span>
+      </label>
+      <p class="ld-sidebar-label">จัดการร้านของคุณ</p>
+      <nav class="ld-navigation" aria-label="เลือกหน้าจอ">
+        <label class="ld-nav-item" for="ld-nav-overview">ภาพรวมการจัดส่ง</label>
+        <label class="ld-nav-item" for="ld-nav-orders">ออเดอร์</label>
+        <label class="ld-nav-item" for="ld-nav-customers">ลูกค้า</label>
+        <label class="ld-nav-item" for="ld-nav-rider">ใบงานไรเดอร์</label>
+      </nav>
+      <div class="ld-sidebar-spacer" aria-hidden="true"></div>
+      <div class="card ld-lunch-window">
+        <strong>รอบมื้อเที่ยง</strong>
+        <span>11:30 → 12:30</span>
+        <p>ส่งให้ทัน ทุกมื้อมีความสุข</p>
+      </div>
+      <p class="ld-system-status"><span aria-hidden="true">●</span> ระบบพร้อมใช้งาน</p>
+    </aside>
+
+    <main class="ld-content">

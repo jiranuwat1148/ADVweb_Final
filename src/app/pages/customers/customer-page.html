@@ -1,0 +1,115 @@
+<section class="ld-page ld-page--customers" aria-labelledby="ld-customers-heading">
+  <header class="ld-header">
+    <div class="ld-heading">
+      <h1 id="ld-customers-heading">ลูกค้าและพิกัดจัดส่ง</h1>
+      <p>บันทึกข้อมูลลูกค้าและตำแหน่งสำหรับจัดส่ง</p>
+    </div>
+    <div class="ld-header-actions">
+      <span class="badge ld-badge">ข้อมูลจริง</span>
+      <button class="btn ld-primary" type="button" (click)="openAdd()" [disabled]="saving() || deleting()">เพิ่มลูกค้า</button>
+    </div>
+  </header>
+
+  @if (notice()) {
+    <div class="ld-alert ld-alert--success" role="status">{{ notice() }}</div>
+  }
+
+  <div class="ld-customers-grid">
+    <div class="ld-customer-list-column" [attr.aria-busy]="store.customersLoading()">
+      <input class="input ld-search" type="search" name="customer-search" aria-label="ค้นหาชื่อหรือเบอร์โทร" placeholder="ค้นหาชื่อหรือเบอร์โทร" [ngModel]="search()" (ngModelChange)="search.set($event)">
+      @if (store.customersLoading()) {
+        <div class="card ld-customer-list"><p class="ld-empty" role="status">กำลังโหลดรายชื่อลูกค้า…</p></div>
+      } @else if (store.customersError()) {
+        <div class="card ld-customer-list">
+          <div class="ld-empty"><p class="ld-alert ld-alert--error" role="alert">{{ store.customersError() }}</p><button class="btn ld-secondary" type="button" (click)="reloadCustomers()">ลองใหม่</button></div>
+        </div>
+      } @else {
+        <div class="card ld-customer-list" aria-label="รายชื่อลูกค้า">
+          @for (customer of filteredCustomers(); track customer.id) {
+            <button class="ld-customer-row" type="button" [class.is-active]="selectedId() === customer.id" [attr.aria-pressed]="selectedId() === customer.id" [disabled]="saving() || deleting()" (click)="selectCustomer(customer.id)">
+              <span class="ld-avatar" aria-hidden="true">{{ customer.name.slice(0, 1) }}</span>
+              <span class="ld-customer-data"><strong>{{ customer.name }}</strong><small>{{ customer.phone }} · {{ customer.address || 'ยังไม่ได้ระบุที่อยู่' }}</small></span>
+              <span aria-hidden="true">→</span>
+            </button>
+          } @empty {
+            <p class="ld-empty">{{ search().trim() ? 'ไม่พบลูกค้าที่ค้นหา' : 'ยังไม่มีข้อมูลลูกค้า กดเพิ่มลูกค้าเพื่อเริ่มต้น' }}</p>
+          }
+        </div>
+        <p class="ld-customer-count">ลูกค้าทั้งหมด {{ store.customers().length }} คน · เลือกเพื่อดูตำแหน่งบ้าน</p>
+      }
+    </div>
+
+    <article class="card ld-customer-detail" [attr.aria-busy]="detailLoading()" aria-label="ข้อมูลลูกค้าที่เลือก">
+      @if (detailLoading()) {
+        <p class="ld-empty" role="status">กำลังโหลดข้อมูลลูกค้า…</p>
+      } @else if (detailError()) {
+        <div class="ld-empty"><p class="ld-alert ld-alert--error" role="alert">{{ detailError() }}</p><button class="btn ld-secondary" type="button" (click)="retryDetail()">ลองโหลดข้อมูลอีกครั้ง</button></div>
+      } @else if (selectedCustomer(); as customer) {
+        <h2>{{ customer.name }}</h2>
+        <p class="ld-detail-subtitle">{{ customer.phone }} · {{ customer.address || 'ยังไม่ได้ระบุที่อยู่' }}</p>
+        <div class="ld-customer-map">
+          <svg xmlns="http://www.w3.org/2000/svg" width="504" height="380" viewBox="0 0 504 380" role="img" aria-labelledby="ld-customer-map-title ld-customer-map-desc" style="font-family: inherit;">
+            <title id="ld-customer-map-title">ภาพตัวอย่างแผนที่ลูกค้า</title>
+            <desc id="ld-customer-map-desc">ภาพวาดตัวอย่างตามแบบหน้าจอ ไม่ได้แสดงพิกัดจริงของลูกค้าที่เลือก ใช้ปุ่มเปิดในแผนที่เพื่อดูพิกัดจริง</desc>
+            <defs><clipPath id="ld-customer-map-clip"><rect width="504" height="380" /></clipPath></defs>
+            <g clip-path="url(#ld-customer-map-clip)">
+              <rect width="504" height="380" fill="#F6F8F5" />
+              <g fill="#EAF3ED"><rect x="65" y="24" width="210" height="100" rx="20" /><rect x="440" y="240" width="170" height="92" rx="24" /></g>
+              <rect x="320" y="90" width="124" height="78" rx="10" fill="#E4E9E3" /><rect x="404" y="0" width="100" height="330" fill="#EAF3ED" />
+              <g fill="none" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M0 80 L250 80 L320 160 L796 160" /><path d="M60 0 L60 310 L796 310" /><path d="M200 0 L200 200 L460 200 L600 392" /><path d="M450 0 L450 280 L300 392" /><path d="M0 255 L110 255 L250 390" /><path d="M620 0 L620 110 L760 220" /><path d="M0 350 L796 350" /><path d="M330 0 L330 80" /><path d="M500 160 L500 0" />
+              </g>
+              <g fill="none" stroke="#E4E9E3" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M0 80 L250 80 L320 160 L796 160" /><path d="M60 0 L60 310 L796 310" /><path d="M200 0 L200 200 L460 200 L600 392" /><path d="M450 0 L450 280 L300 392" /><path d="M0 255 L110 255 L250 390" /><path d="M620 0 L620 110 L760 220" /><path d="M0 350 L796 350" /><path d="M330 0 L330 80" /><path d="M500 160 L500 0" />
+              </g>
+              <g fill="#7D8D82" font-size="12" font-weight="500"><text x="79" y="69">มหาวิทยาลัยมหาสารคาม</text><text x="312" y="183">ถนนขามเรียง</text><text x="469" y="275">โซนหอพัก</text><text x="616" y="113">ท่าขอนยาง</text></g>
+              <rect x="325" y="271" width="38" height="38" rx="12" fill="#163E32" /><text x="344" y="295" fill="#FFFFFF" font-size="14" font-weight="600" text-anchor="middle">ท</text>
+              <rect x="307" y="313" width="74" height="36" fill="#FFFFFF" /><text x="315" y="335" fill="#163E32" font-size="12" font-weight="500">ร้านเที่ยงไว</text>
+              <circle cx="202" cy="201" r="16" fill="#217A54" /><text x="202" y="206" fill="#FFFFFF" font-size="14" font-weight="600" text-anchor="middle">ก</text><text x="177" y="239" fill="#217A54" font-size="12" font-weight="500">บ้านลูกค้า</text>
+            </g>
+          </svg>
+        </div>
+        <p class="ld-map-note">ภาพแผนที่ตัวอย่าง ไม่ใช่ตำแหน่งจริงของลูกค้า</p>
+        <div class="ld-location-fields">
+          <h3>ตำแหน่งที่บันทึก</h3>
+          <p>ละติจูด {{ customer.latitude | number:'1.4-6' }} · ลองจิจูด {{ customer.longitude | number:'1.4-6' }}</p>
+        </div>
+        <div class="ld-customer-actions">
+          <button class="btn ld-primary" type="button" [disabled]="saving() || deleting()" (click)="openEdit(customer)">แก้ไขข้อมูล</button>
+          @if (mapsUrl(); as url) { <a class="btn ld-secondary" [href]="url" target="_blank" rel="noopener noreferrer">เปิดในแผนที่ ↗</a> }
+        </div>
+        <button class="ld-text-action ld-delete-customer" type="button" [disabled]="saving() || deleting()" (click)="openDelete(customer)">ลบลูกค้านี้</button>
+      } @else {
+        <p class="ld-empty">เลือกลูกค้าจากรายการเพื่อดูข้อมูลและพิกัด</p>
+      }
+    </article>
+  </div>
+</section>
+
+<dialog #customerDialog class="ld-dialog" aria-labelledby="ld-customer-form-heading" (cancel)="cancelCustomerDialog($event)">
+  <form (ngSubmit)="saveCustomer()" novalidate>
+    <div class="ld-dialog-head"><h2 id="ld-customer-form-heading">{{ editingId() === null ? 'เพิ่มลูกค้า' : 'แก้ไขข้อมูลลูกค้า' }}</h2><button class="ld-text-action" type="button" (click)="closeCustomerDialog()" [disabled]="saving()" aria-label="ปิดแบบฟอร์มลูกค้า">ปิด</button></div>
+    <div class="ld-dialog-body">
+      @if (formError()) { <p class="ld-alert ld-alert--error" role="alert">{{ formError() }}</p> }
+      <fieldset class="ld-form-grid" [disabled]="saving()">
+        <div class="ld-field"><label for="ld-customer-name">ชื่อ <span aria-hidden="true">*</span></label><input class="ld-input" id="ld-customer-name" name="customerName" [(ngModel)]="form.name" required maxlength="100" autocomplete="name" autofocus></div>
+        <div class="ld-field"><label for="ld-customer-phone">เบอร์โทร <span aria-hidden="true">*</span></label><input class="ld-input" id="ld-customer-phone" name="customerPhone" type="tel" [(ngModel)]="form.phone" required maxlength="20" autocomplete="tel"></div>
+        <div class="ld-field ld-field-full"><label for="ld-customer-address">ที่อยู่ / จุดสังเกต (เว้นว่างได้)</label><textarea class="ld-input" id="ld-customer-address" name="customerAddress" [(ngModel)]="form.address" maxlength="500" rows="3" autocomplete="street-address"></textarea></div>
+        <div class="ld-field"><label for="ld-customer-latitude">ละติจูด <span aria-hidden="true">*</span></label><input class="ld-input" id="ld-customer-latitude" name="customerLatitude" type="number" [(ngModel)]="form.latitude" min="-90" max="90" step="any" required inputmode="decimal" placeholder="เช่น 16.2504"></div>
+        <div class="ld-field"><label for="ld-customer-longitude">ลองจิจูด <span aria-hidden="true">*</span></label><input class="ld-input" id="ld-customer-longitude" name="customerLongitude" type="number" [(ngModel)]="form.longitude" min="-180" max="180" step="any" required inputmode="decimal" placeholder="เช่น 103.2458"></div>
+      </fieldset>
+      <p class="ld-muted">กรอกพิกัดบ้านจากแอปแผนที่ ช่องที่มี * จำเป็นต้องกรอก</p>
+    </div>
+    <div class="ld-dialog-actions"><button class="btn ld-secondary" type="button" (click)="closeCustomerDialog()" [disabled]="saving()">ยกเลิก</button><button class="btn ld-primary" type="submit" [disabled]="saving()">{{ saving() ? 'กำลังบันทึก…' : 'บันทึกลูกค้า' }}</button></div>
+  </form>
+</dialog>
+
+<dialog #deleteDialog class="ld-dialog" aria-labelledby="ld-delete-customer-heading" (cancel)="cancelDeleteDialog($event)">
+  <div class="ld-dialog-head"><h2 id="ld-delete-customer-heading">ยืนยันการลบลูกค้า</h2><button class="ld-text-action" type="button" (click)="closeDeleteDialog()" [disabled]="deleting()" aria-label="ปิดการยืนยันลบ">ปิด</button></div>
+  <div class="ld-dialog-body">
+    <p>ต้องการลบข้อมูลของ <strong>{{ deleteTarget()?.name }}</strong> ใช่ไหม?</p>
+    <p class="ld-muted">ลูกค้าที่มีออเดอร์อยู่จะลบไม่ได้ กรุณาตรวจสอบก่อนยืนยัน</p>
+    @if (deleteError()) { <p class="ld-alert ld-alert--error" role="alert">{{ deleteError() }}</p> }
+  </div>
+  <div class="ld-dialog-actions"><button class="btn ld-secondary" type="button" (click)="closeDeleteDialog()" [disabled]="deleting()">ยกเลิก</button><button class="btn ld-danger" type="button" (click)="deleteCustomer()" [disabled]="deleting()">{{ deleting() ? 'กำลังลบ…' : 'ยืนยันลบลูกค้า' }}</button></div>
+</dialog>

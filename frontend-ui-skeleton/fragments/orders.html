@@ -1,0 +1,121 @@
+<section class="ld-page ld-page--orders" id="ld-page-orders" aria-labelledby="ld-orders-heading">
+  <header class="ld-header">
+    <div class="ld-heading">
+      <h1 id="ld-orders-heading">ออเดอร์มื้อเที่ยง</h1>
+      <p>จัดการรายการสั่งซื้อก่อนออกส่ง · 24 ออเดอร์วันนี้</p>
+    </div>
+    <div class="ld-header-actions">
+      <span class="badge ld-badge">ข้อมูลจำลอง</span>
+      <!-- TODO: เชื่อมปุ่มเพิ่มออเดอร์กับฟอร์มและ POST /api/orders ภายหลัง -->
+      <button class="btn ld-primary" type="button" data-action="add-order">เพิ่มออเดอร์</button>
+    </div>
+  </header>
+
+  <!-- TODO: แทนค่าตัวอย่างด้วยสรุปออเดอร์ของวันที่เลือกจาก backend -->
+  <div class="ld-stats">
+    <article class="card ld-stat">
+      <p class="ld-stat-label">ออเดอร์ทั้งหมด</p>
+      <p class="ld-stat-number">24</p>
+      <p class="ld-stat-note">ข้อมูลจำลองสำหรับทดสอบ</p>
+    </article>
+    <article class="card ld-stat">
+      <p class="ld-stat-label">จำนวนกล่อง</p>
+      <p class="ld-stat-number">48</p>
+      <p class="ld-stat-note">1–3 กล่องต่อออเดอร์</p>
+    </article>
+    <article class="card ld-stat">
+      <p class="ld-stat-label">พร้อมจัดส่ง</p>
+      <p class="ld-stat-number">24</p>
+      <p class="ld-stat-note">ยังไม่ยืนยันใบงาน</p>
+    </article>
+    <article class="card ld-stat ld-stat--soft">
+      <p class="ld-stat-label">รายได้รวม</p>
+      <p class="ld-stat-number"><span class="ld-currency">฿</span>3,120</p>
+      <p class="ld-stat-note">ราคากล่องละ 65 บาท</p>
+    </article>
+  </div>
+
+  <!-- TODO: เชื่อมการค้นหา ตัวกรอง และ POST /api/orders/simulate ภายหลัง -->
+  <div class="ld-order-filters">
+    <input class="input ld-search" type="search" name="order-search" aria-label="ค้นหาเลขออเดอร์หรือชื่อลูกค้า" placeholder="ค้นหาเลขออเดอร์หรือชื่อลูกค้า" data-action="search-orders">
+    <button class="badge ld-badge" type="button" data-action="filter-orders" data-filter="all" aria-pressed="true">ทั้งหมด 24</button>
+    <button class="badge ld-badge" type="button" data-action="filter-orders" data-filter="pending" aria-pressed="false">พร้อมจัดส่ง</button>
+    <button class="btn ld-secondary" type="button" data-action="simulate-orders" data-count="24">จำลอง 24 ออเดอร์</button>
+  </div>
+
+  <!-- TODO: แทนแถวตัวอย่างด้วย GET /api/orders; เชื่อมแก้ไขและลบตาม data-order-id -->
+  <div class="card ld-table-card">
+    <table class="table ld-orders-table" aria-label="ออเดอร์มื้อเที่ยง">
+      <thead>
+        <tr>
+          <th scope="col">เลขออเดอร์</th>
+          <th scope="col">ลูกค้า</th>
+          <th scope="col">จำนวน</th>
+          <th scope="col">ยอดรวม</th>
+          <th scope="col">สถานะ</th>
+          <th scope="col">จัดการ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-order-id="1">
+          <td>ORD-001</td>
+          <td>กมลชนก ใจดี</td>
+          <td>2 กล่อง</td>
+          <td><span class="ld-currency">฿</span>130</td>
+          <td><span class="ld-inline-status"><span aria-hidden="true">●</span> พร้อมจัดส่ง</span></td>
+          <td><div class="ld-table-actions"><button class="ld-text-action" type="button" data-action="edit-order" data-order-id="1" aria-label="แก้ไขออเดอร์ ORD-001">แก้ไข</button><span aria-hidden="true">·</span><button class="ld-text-action" type="button" data-action="delete-order" data-order-id="1" aria-label="ลบออเดอร์ ORD-001">ลบ</button></div></td>
+        </tr>
+        <tr data-order-id="2">
+          <td>ORD-002</td>
+          <td>พิมพ์ชนก แก้วใส</td>
+          <td>3 กล่อง</td>
+          <td><span class="ld-currency">฿</span>195</td>
+          <td><span class="ld-inline-status"><span aria-hidden="true">●</span> พร้อมจัดส่ง</span></td>
+          <td><div class="ld-table-actions"><button class="ld-text-action" type="button" data-action="edit-order" data-order-id="2" aria-label="แก้ไขออเดอร์ ORD-002">แก้ไข</button><span aria-hidden="true">·</span><button class="ld-text-action" type="button" data-action="delete-order" data-order-id="2" aria-label="ลบออเดอร์ ORD-002">ลบ</button></div></td>
+        </tr>
+        <tr data-order-id="3">
+          <td>ORD-003</td>
+          <td>ธนกฤต พรมมา</td>
+          <td>1 กล่อง</td>
+          <td><span class="ld-currency">฿</span>65</td>
+          <td><span class="ld-inline-status"><span aria-hidden="true">●</span> พร้อมจัดส่ง</span></td>
+          <td><div class="ld-table-actions"><button class="ld-text-action" type="button" data-action="edit-order" data-order-id="3" aria-label="แก้ไขออเดอร์ ORD-003">แก้ไข</button><span aria-hidden="true">·</span><button class="ld-text-action" type="button" data-action="delete-order" data-order-id="3" aria-label="ลบออเดอร์ ORD-003">ลบ</button></div></td>
+        </tr>
+        <tr data-order-id="4">
+          <td>ORD-004</td>
+          <td>สุธิดา รุ่งเรือง</td>
+          <td>2 กล่อง</td>
+          <td><span class="ld-currency">฿</span>130</td>
+          <td><span class="ld-inline-status"><span aria-hidden="true">●</span> พร้อมจัดส่ง</span></td>
+          <td><div class="ld-table-actions"><button class="ld-text-action" type="button" data-action="edit-order" data-order-id="4" aria-label="แก้ไขออเดอร์ ORD-004">แก้ไข</button><span aria-hidden="true">·</span><button class="ld-text-action" type="button" data-action="delete-order" data-order-id="4" aria-label="ลบออเดอร์ ORD-004">ลบ</button></div></td>
+        </tr>
+        <tr data-order-id="5">
+          <td>ORD-005</td>
+          <td>ณัฐวุฒิ บุญมี</td>
+          <td>3 กล่อง</td>
+          <td><span class="ld-currency">฿</span>195</td>
+          <td><span class="ld-inline-status"><span aria-hidden="true">●</span> พร้อมจัดส่ง</span></td>
+          <td><div class="ld-table-actions"><button class="ld-text-action" type="button" data-action="edit-order" data-order-id="5" aria-label="แก้ไขออเดอร์ ORD-005">แก้ไข</button><span aria-hidden="true">·</span><button class="ld-text-action" type="button" data-action="delete-order" data-order-id="5" aria-label="ลบออเดอร์ ORD-005">ลบ</button></div></td>
+        </tr>
+        <tr data-order-id="6">
+          <td>ORD-006</td>
+          <td>ปวีณา คำสุข</td>
+          <td>2 กล่อง</td>
+          <td><span class="ld-currency">฿</span>130</td>
+          <td><span class="ld-inline-status"><span aria-hidden="true">●</span> พร้อมจัดส่ง</span></td>
+          <td><div class="ld-table-actions"><button class="ld-text-action" type="button" data-action="edit-order" data-order-id="6" aria-label="แก้ไขออเดอร์ ORD-006">แก้ไข</button><span aria-hidden="true">·</span><button class="ld-text-action" type="button" data-action="delete-order" data-order-id="6" aria-label="ลบออเดอร์ ORD-006">ลบ</button></div></td>
+        </tr>
+        <tr data-order-id="7">
+          <td>ORD-007</td>
+          <td>วราภรณ์ ศรีไทย</td>
+          <td>1 กล่อง</td>
+          <td><span class="ld-currency">฿</span>65</td>
+          <td><span class="ld-inline-status"><span aria-hidden="true">●</span> พร้อมจัดส่ง</span></td>
+          <td><div class="ld-table-actions"><button class="ld-text-action" type="button" data-action="edit-order" data-order-id="7" aria-label="แก้ไขออเดอร์ ORD-007">แก้ไข</button><span aria-hidden="true">·</span><button class="ld-text-action" type="button" data-action="delete-order" data-order-id="7" aria-label="ลบออเดอร์ ORD-007">ลบ</button></div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="ld-rule-note">ตรวจสอบจำนวนกล่องและพิกัดลูกค้าให้ครบ ก่อนสร้างแผนจัดส่ง</p>
+</section>

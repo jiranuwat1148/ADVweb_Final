@@ -1,0 +1,138 @@
+<section class="ld-page ld-page--orders" id="ld-page-orders" aria-labelledby="ld-orders-heading">
+  <header class="ld-header">
+    <div class="ld-heading">
+      <h1 id="ld-orders-heading">ออเดอร์มื้อเที่ยง</h1>
+      <p>จัดการรายการสั่งซื้อก่อนออกส่ง · {{ store.selectedDate() ? 'วันที่ ' + store.selectedDate() : 'ทุกวัน' }} · {{ store.dateOrders().length }} ออเดอร์</p>
+    </div>
+    <div class="ld-header-actions">
+      <span class="badge ld-badge">ข้อมูลจากฐานข้อมูล</span>
+      <button class="btn ld-primary" type="button" (click)="openAdd()" [disabled]="busy() || store.ordersLoading() || store.customersLoading() || !store.customers().length">เพิ่มออเดอร์</button>
+    </div>
+  </header>
+
+  <div class="ld-stats">
+    <article class="card ld-stat">
+      <p class="ld-stat-label">ออเดอร์ทั้งหมด</p>
+      <p class="ld-stat-number">{{ store.activeOrders().length | number }}</p>
+      <p class="ld-stat-note">ไม่นับรายการยกเลิก</p>
+    </article>
+    <article class="card ld-stat">
+      <p class="ld-stat-label">จำนวนกล่อง</p>
+      <p class="ld-stat-number">{{ store.totalBoxes() | number }}</p>
+      <p class="ld-stat-note">1–3 กล่องต่อออเดอร์</p>
+    </article>
+    <article class="card ld-stat">
+      <p class="ld-stat-label">พร้อมจัดส่ง</p>
+      <p class="ld-stat-number">{{ store.pendingCount() | number }}</p>
+      <p class="ld-stat-note">สถานะ PENDING</p>
+    </article>
+    <article class="card ld-stat ld-stat--soft">
+      <p class="ld-stat-label">รายได้รวม</p>
+      <p class="ld-stat-number"><span class="ld-currency">฿</span>{{ store.revenue() | number:'1.0-2' }}</p>
+      <p class="ld-stat-note">ราคากล่องละ {{ boxPrice }} บาท · ไม่นับรายการยกเลิก</p>
+    </article>
+  </div>
+
+  <div class="ld-toolbar ld-order-date-filter">
+    <label class="ld-field" for="order-date-filter">
+      <span>วันที่จัดส่ง</span>
+      <input #dateFilter class="ld-input" id="order-date-filter" type="date" min="1000-01-01" max="9999-12-31" [value]="store.selectedDate()" (change)="setDateFilter(dateFilter.value)">
+    </label>
+    <button class="btn ld-secondary" type="button" (click)="setDateFilter('')">ทุกวัน</button>
+    <button class="btn ld-secondary" type="button" (click)="reloadOrders()" [disabled]="busy() || store.ordersLoading()">{{ store.ordersLoading() ? 'กำลังโหลด…' : 'โหลดข้อมูลใหม่' }}</button>
+  </div>
+  @if (dateFilterError()) { <p class="ld-alert ld-alert--error" role="alert">{{ dateFilterError() }}</p> }
+  @if (notice()) { <p class="ld-alert ld-alert--success" role="status">{{ notice() }}</p> }
+  @if (pageError()) { <p class="ld-alert ld-alert--error" role="alert">{{ pageError() }}</p> }
+  @if (store.ordersError()) { <p class="ld-alert ld-alert--error" role="alert">{{ store.ordersError() }}</p> }
+  @if (store.customersError()) { <p class="ld-alert ld-alert--error" role="alert">โหลดรายชื่อลูกค้าไม่สำเร็จ: {{ store.customersError() }}</p> }
+  @if (!store.customersLoading() && !store.customersError() && !store.customers().length) { <p class="ld-muted">ยังไม่มีลูกค้า กรุณาเพิ่มลูกค้าที่หน้าลูกค้าก่อนเพิ่มหรือจำลองออเดอร์</p> }
+
+  <div class="ld-order-filters">
+    <input #orderSearch class="input ld-search" type="search" name="order-search" aria-label="ค้นหาเลขออเดอร์ ชื่อ หรือเบอร์โทรลูกค้า" placeholder="ค้นหาเลขออเดอร์หรือชื่อลูกค้า" [value]="search()" (input)="search.set(orderSearch.value)">
+    <button class="badge ld-badge" type="button" (click)="filter.set('all')" [attr.aria-pressed]="filter() === 'all'">ทั้งหมด {{ store.dateOrders().length }}</button>
+    <button class="badge ld-badge" type="button" (click)="filter.set('pending')" [attr.aria-pressed]="filter() === 'pending'">พร้อมจัดส่ง {{ store.pendingCount() }}</button>
+    <button class="btn ld-secondary" type="button" (click)="openSimulation()" [disabled]="busy() || store.ordersLoading() || store.customersLoading()">จำลองออเดอร์</button>
+  </div>
+
+  @if (store.ordersLoading()) {
+    <p class="ld-empty" role="status">กำลังโหลดออเดอร์…</p>
+  } @else if (!store.ordersError()) {
+    @if (!visibleOrders().length) {
+      <p class="ld-empty" role="status">{{ store.dateOrders().length ? 'ไม่พบออเดอร์ที่ตรงกับการค้นหาหรือตัวกรอง' : 'ยังไม่มีออเดอร์ในช่วงวันที่เลือก' }}</p>
+    } @else {
+      <div class="card ld-table-card">
+        <table class="table ld-orders-table" aria-label="ออเดอร์มื้อเที่ยง">
+          <thead><tr><th scope="col">เลขออเดอร์</th><th scope="col">ลูกค้า</th><th scope="col">จำนวน</th><th scope="col">ยอดรวม</th><th scope="col">วันที่ / สถานะ</th><th scope="col">จัดการ</th></tr></thead>
+          <tbody>
+            @for (order of visibleOrders(); track order.id) {
+              <tr [attr.data-order-id]="order.id">
+                <td>{{ orderCode(order.id) }}</td>
+                <td>{{ order.customer_name }}<small class="ld-order-customer-phone">{{ order.customer_phone }}</small></td>
+                <td>{{ order.quantity }} กล่อง</td>
+                <td><span class="ld-currency">฿</span>{{ order.quantity * boxPrice | number:'1.0-2' }}</td>
+                <td><small class="ld-order-date">{{ order.delivery_date }}</small><span class="ld-inline-status" [class.ld-inline-status--muted]="order.status !== 'PENDING'"><span aria-hidden="true">●</span> {{ statusLabel(order.status) }}</span></td>
+                <td>
+                  <div class="ld-table-actions">
+                    <button class="ld-text-action" type="button" (click)="openEdit(order)" [disabled]="busy() || order.status !== 'PENDING'" [attr.aria-label]="'แก้ไขออเดอร์ ' + orderCode(order.id)" [attr.title]="order.status !== 'PENDING' ? 'แก้ไขได้เฉพาะออเดอร์ PENDING' : null">แก้ไข</button>
+                    <span aria-hidden="true">·</span>
+                    <button class="ld-text-action ld-danger" type="button" (click)="openDelete(order)" [disabled]="busy()" [attr.aria-label]="'ลบออเดอร์ ' + orderCode(order.id)">ลบ</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+  <p class="ld-rule-note">ตรวจสอบจำนวนกล่องและพิกัดลูกค้าให้ครบ ก่อนสร้างแผนจัดส่ง</p>
+</section>
+
+<dialog #orderDialog class="ld-dialog" aria-labelledby="order-dialog-title" (cancel)="cancelEditor($event)">
+  <form (ngSubmit)="saveOrder()">
+    <div class="ld-dialog-head"><h2 id="order-dialog-title">{{ editorMode() === 'edit' ? 'แก้ไขออเดอร์ ' + (editingOrder() ? orderCode(editingOrder()!.id) : '') : 'เพิ่มออเดอร์' }}</h2><button class="ld-text-action" type="button" aria-label="ปิดฟอร์มออเดอร์" (click)="closeEditor()" [disabled]="busy()">ปิด</button></div>
+    <div class="ld-dialog-body">
+      @if (editorLoading()) { <p role="status">กำลังโหลดรายละเอียดออเดอร์…</p> }
+      @if (editorError()) { <p class="ld-alert ld-alert--error" role="alert">{{ editorError() }}</p> }
+      @if (!editorLoading() && (editorMode() === 'add' || editingOrder())) {
+        <fieldset class="ld-form-grid" [disabled]="busy() || (editorMode() === 'edit' && editingOrder()?.status !== 'PENDING')">
+          @if (editorMode() === 'add') {
+            <label class="ld-field ld-field-full" for="order-customer"><span>ลูกค้า</span><select class="ld-input" id="order-customer" name="order-customer" [(ngModel)]="orderForm.customer_id" required><option [ngValue]="null">เลือกลูกค้า</option>@for (customer of store.customers(); track customer.id) { <option [ngValue]="customer.id">{{ customer.name }} · {{ customer.phone }}</option> }</select></label>
+            @if (!store.customers().length) { <p class="ld-muted ld-field-full">กรุณาเพิ่มลูกค้าหรือโหลดรายชื่อลูกค้าก่อนเพิ่มออเดอร์</p> }
+          } @else {
+            <div class="ld-field ld-field-full"><span>ลูกค้า</span><p>{{ editingOrder()?.customer_name }} · {{ editingOrder()?.customer_phone }}</p><small class="ld-muted">แก้ไขได้เฉพาะจำนวนกล่องและวันที่ส่ง</small></div>
+          }
+          <label class="ld-field" for="order-quantity"><span>จำนวนกล่อง</span><input class="ld-input" id="order-quantity" name="order-quantity" type="number" min="1" max="3" step="1" [(ngModel)]="orderForm.quantity" required></label>
+          <label class="ld-field" for="order-delivery-date"><span>วันที่จัดส่ง</span><input class="ld-input" id="order-delivery-date" name="order-delivery-date" type="date" min="1000-01-01" max="9999-12-31" [(ngModel)]="orderForm.delivery_date" required></label>
+        </fieldset>
+      }
+    </div>
+    <div class="ld-dialog-actions"><button class="btn ld-secondary" type="button" (click)="closeEditor()" [disabled]="busy()">ยกเลิก</button><button class="btn ld-primary" type="submit" [disabled]="busy() || editorLoading() || store.ordersLoading() || (editorMode() === 'edit' && (!editingOrder() || editingOrder()?.status !== 'PENDING'))">{{ busy() ? 'กำลังบันทึก…' : 'บันทึกออเดอร์' }}</button></div>
+  </form>
+</dialog>
+
+<dialog #deleteDialog class="ld-dialog" aria-labelledby="delete-order-title" (cancel)="cancelDelete($event)">
+  <div class="ld-dialog-head"><h2 id="delete-order-title">ยืนยันลบออเดอร์</h2><button class="ld-text-action" type="button" aria-label="ปิดการยืนยันลบ" (click)="closeDelete()" [disabled]="busy()">ปิด</button></div>
+  <div class="ld-dialog-body">
+    @if (deletingOrder(); as order) { <p>ลบ {{ orderCode(order.id) }} ของ {{ order.customer_name }} จำนวน {{ order.quantity }} กล่อง วันที่ {{ order.delivery_date }}?</p><p class="ld-muted">รายการนี้จะถูกลบออกจากฐานข้อมูล หากอยู่ในแผนจัดส่งแล้ว backend จะปฏิเสธการลบ</p> }
+    @if (deleteError()) { <p class="ld-alert ld-alert--error" role="alert">{{ deleteError() }}</p> }
+  </div>
+  <div class="ld-dialog-actions"><button class="btn ld-secondary" type="button" (click)="closeDelete()" [disabled]="busy()">ยกเลิก</button><button class="btn ld-primary ld-order-delete-confirm" type="button" (click)="confirmDelete()" [disabled]="busy() || store.ordersLoading() || !deletingOrder()">{{ busy() ? 'กำลังลบ…' : 'ยืนยันลบออเดอร์' }}</button></div>
+</dialog>
+
+<dialog #simulationDialog class="ld-dialog" aria-labelledby="simulate-orders-title" (cancel)="cancelSimulation($event)">
+  <form (ngSubmit)="simulateOrders()">
+    <div class="ld-dialog-head"><h2 id="simulate-orders-title">จำลองออเดอร์</h2><button class="ld-text-action" type="button" aria-label="ปิดการจำลองออเดอร์" (click)="closeSimulation()" [disabled]="busy()">ปิด</button></div>
+    <div class="ld-dialog-body">
+      <p>การยืนยันจะเพิ่มออเดอร์ใหม่ลงฐานข้อมูลจริง โดยสุ่มลูกค้าและจำนวนอาหาร 1–3 กล่องต่อออเดอร์</p>
+      <p class="ld-muted">ต้องมีลูกค้าอย่างน้อยเท่ากับจำนวนออเดอร์ ในขณะนี้โหลดลูกค้าไว้ {{ store.customers().length }} คน</p>
+      @if (simulationError()) { <p class="ld-alert ld-alert--error" role="alert">{{ simulationError() }}</p> }
+      <fieldset class="ld-form-grid" [disabled]="busy()">
+        <label class="ld-field" for="simulation-count"><span>จำนวนออเดอร์ (20–30)</span><input class="ld-input" id="simulation-count" name="simulation-count" type="number" min="20" max="30" step="1" [(ngModel)]="simulationForm.count" required></label>
+        <label class="ld-field" for="simulation-date"><span>วันที่จัดส่ง</span><input class="ld-input" id="simulation-date" name="simulation-date" type="date" min="1000-01-01" max="9999-12-31" [(ngModel)]="simulationForm.delivery_date" required></label>
+      </fieldset>
+    </div>
+    <div class="ld-dialog-actions"><button class="btn ld-secondary" type="button" (click)="closeSimulation()" [disabled]="busy()">ยกเลิก</button><button class="btn ld-primary" type="submit" [disabled]="busy() || store.ordersLoading()">{{ busy() ? 'กำลังเพิ่มออเดอร์…' : 'ยืนยันเพิ่มออเดอร์จำลอง' }}</button></div>
+  </form>
+</dialog>
