@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only server.ts",
     "start": "ts-node --transpile-only server.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node scripts/test.cjs",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "ts-node scripts/migrate.ts",
+    "auth:setup": "ts-node scripts/setup-auth.ts"
   },
   "keywords": [],
   "author": "",

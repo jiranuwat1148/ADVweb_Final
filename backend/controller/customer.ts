@@ -1,258 +1,149 @@
 import { Router } from "express";
 import { conn } from "./dbconnect";
 import type { RowDataPacket, ResultSetHeader } from "mysql2";
+import { withDispatchTransaction } from "../services/dispatch-db";
+import { HttpError, sendApiError } from "../services/errors";
+import { todayInBangkok } from "../services/validation";
 
 export const customerRouter = Router();
 
+interface CustomerInput {
+  name: string;
+  phone: string;
+  address: string | null;
+  latitude: number;
+  longitude: number;
+}
+
+function customerInput(body: unknown): CustomerInput {
+  const fields = typeof body === "object" && body !== null
+    ? body as Record<string, unknown>
+    : {};
+  const { name, phone, address, latitude, longitude } = fields;
+  if (typeof name !== "string" || name.trim().length === 0 || name.trim().length > 100) {
+    throw new HttpError(400, "กรุณากรอกชื่อไม่เกิน 100 ตัวอักษร");
+  }
+  if (typeof phone !== "string" || phone.trim().length === 0 || phone.trim().length > 20) {
+    throw new HttpError(400, "กรุณากรอกเบอร์โทรไม่เกิน 20 ตัวอักษร");
+  }
+  if (address !== undefined && address !== null &&
+      (typeof address !== "string" || address.trim().length > 500)) {
+    throw new HttpError(400, "ที่อยู่ต้องเป็นข้อความไม่เกิน 500 ตัวอักษร");
+  }
+  if (typeof latitude !== "number" || !Number.isFinite(latitude) || latitude < -90 || latitude > 90 ||
+      typeof longitude !== "number" || !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+    throw new HttpError(400, "พิกัด latitude หรือ longitude ไม่ถูกต้อง");
+  }
+  return {
+    name: name.trim(),
+    phone: phone.trim(),
+    address: typeof address === "string" ? address.trim() || null : null,
+    latitude,
+    longitude,
+  };
+}
+
+function customerId(value: unknown): number {
+  const id = Number(value);
+  if (!Number.isSafeInteger(id) || id < 1 || id > 4294967295) {
+    throw new HttpError(400, "id ลูกค้าไม่ถูกต้อง");
+  }
+  return id;
+}
+
 customerRouter.get("/", async (_req, res) => {
   try {
-    const [rows] = await conn.execute(
+    const [rows] = await conn.execute<RowDataPacket[]>(
       "SELECT id, name, phone, address, latitude, longitude FROM customer ORDER BY id"
     );
-
     res.json(rows);
   } catch (error) {
-    console.error("GET /api/customers:", error);
-
-    res.status(500).json({
-      message: "อ่านข้อมูลลูกค้าไม่สำเร็จ",
-    });
+    sendApiError(res, error, "อ่านข้อมูลลูกค้าไม่สำเร็จ", "GET /api/customers");
   }
 });
 
 customerRouter.get("/:id", async (req, res) => {
-  const customerId = req.params.id;
   try {
+    const id = customerId(req.params.id);
     const [rows] = await conn.execute<RowDataPacket[]>(
-      "SELECT * FROM customer WHERE id = ?",
-      [customerId]
-    );  
-    if (rows.length === 0) {
-      res.status(404).json({
-        message: "ไม่พบข้อมูลลูกค้า",
-      });
-      return;
-    }
+      "SELECT * FROM customer WHERE id = ?", [id]
+    );
+    if (rows.length === 0) throw new HttpError(404, "ไม่พบข้อมูลลูกค้า");
     res.json(rows[0]);
   } catch (error) {
-    console.error("GET /api/customers/:id:", error);
-    res.status(500).json({
-      message: "อ่านข้อมูลลูกค้าไม่สำเร็จ",
-    });
+    sendApiError(res, error, "อ่านข้อมูลลูกค้าไม่สำเร็จ", "GET /api/customers/:id");
   }
 });
 
 customerRouter.post("/", async (req, res) => {
-  const { name, phone, address, latitude, longitude } = req.body ?? {};
-  if (
-    typeof name !== "string" || // ถ้า name ไม่ใช่ข้อความ
-    name.trim().length === 0 || // ถ้า name เป็นข้อความว่าง
-    name.trim().length > 100 // ถ้า name เป็นข้อความยาวเกิน 100 ตัวอักษร
-  ) {
-    res.status(400).json({ message: "กรุณากรอกชื่อไม่เกิน 100 ตัวอักษร" });
-    return;
-  }
-  if (
-    typeof phone !== "string" ||
-    phone.trim().length === 0 ||
-    phone.trim().length > 20
-  ) {
-    res.status(400).json({ message: "กรุณากรอกเบอร์โทรไม่เกิน 20 ตัวอักษร" });
-    return;
-  }
-  if (
-    address !== undefined &&
-    address !== null &&
-    (typeof address !== "string" || address.trim().length > 500)
-  ) {
-    res.status(400).json({ message: "ที่อยู่ต้องเป็นข้อความไม่เกิน 500 ตัวอักษร" });
-    return;
-  }
-  if (
-    typeof latitude !== "number" || // ตรวจว่าพิกัดเป็นตัวเลข
-    !Number.isFinite(latitude) || // ตรวจว่าพิกัดเป็นตัวเลข finite
-    latitude < -90 || // ตรวจว่าพิกัด latitude อยู่ในช่วง -90 ถึง 90
-    latitude > 90 || // ตรวจว่าพิกัด latitude อยู่ในช่วง -90 ถึง 90
-    typeof longitude !== "number" ||
-    !Number.isFinite(longitude) || 
-    longitude < -180 || // ตรวจว่าพิกัด longitude อยู่ในช่วง -180 ถึง 180
-    longitude > 180
-  ) {
-    res.status(400).json({ message: "พิกัด latitude หรือ longitude ไม่ถูกต้อง" });
-    return;
-  }
-  const savedAddress =
-    typeof address === "string" ? address.trim() || null : null;
-
   try {
-    const [result] = await conn.execute<ResultSetHeader>(
-      `INSERT INTO customer
-       (name, phone, address, latitude, longitude)
-       VALUES (?, ?, ?, ?, ?)`,
-      [name.trim(), phone.trim(), savedAddress, latitude, longitude]
-    );
-
-    res.status(201).json({
-      message: "เพิ่มลูกค้าเรียบร้อยแล้ว",
-      id: result.insertId,
+    const input = customerInput(req.body);
+    const result = await withDispatchTransaction(async db => {
+      const [created] = await db.execute<ResultSetHeader>(
+        `INSERT INTO customer (name, phone, address, latitude, longitude)
+         VALUES (?, ?, ?, ?, ?)`,
+        [input.name, input.phone, input.address, input.latitude, input.longitude]
+      );
+      return created;
     });
+    res.status(201).json({ message: "เพิ่มลูกค้าเรียบร้อยแล้ว", id: result.insertId });
   } catch (error) {
-    console.error("POST /api/customers:", error);
-    res.status(500).json({
-      message: "เพิ่มลูกค้าไม่สำเร็จ",
-    });
+    sendApiError(res, error, "เพิ่มลูกค้าไม่สำเร็จ", "POST /api/customers");
   }
 });
+
 customerRouter.put("/:id", async (req, res) => {
-  const id = Number(req.params.id);
-  if (!Number.isSafeInteger(id) || id < 1 || id > 4294967295) {
-    res.status(400).json({ message: "id ลูกค้าไม่ถูกต้อง" });
-    return;
-  }
-  const { name, phone, address, latitude, longitude } = req.body ?? {};
-
-  if (
-    typeof name !== "string" ||
-    name.trim().length === 0 ||
-    name.trim().length > 100
-  ) {
-    res.status(400).json({ message: "กรุณากรอกชื่อไม่เกิน 100 ตัวอักษร" });
-    return;
-  }
-
-  // 3. ตรวจเบอร์โทร: เก็บเป็นข้อความเพื่อรักษาเลข 0 ข้างหน้า
-  if (
-    typeof phone !== "string" ||
-    phone.trim().length === 0 ||
-    phone.trim().length > 20
-  ) {
-    res.status(400).json({ message: "กรุณากรอกเบอร์โทรไม่เกิน 20 ตัวอักษร" });
-    return;
-  }
-
-  // 4. ที่อยู่เว้นว่างได้ แต่ถ้าส่งมาต้องเป็นข้อความไม่เกิน 500 ตัวอักษร
-  if (
-    address !== undefined &&
-    address !== null &&
-    (typeof address !== "string" || address.trim().length > 500)
-  ) {
-    res.status(400).json({ message: "ที่อยู่ต้องเป็นข้อความไม่เกิน 500 ตัวอักษร" });
-    return;
-  }
-
-  // 5. ตรวจว่าพิกัดเป็นตัวเลขและอยู่ในช่วงที่ถูกต้อง
-  if (
-    typeof latitude !== "number" ||
-    !Number.isFinite(latitude) ||
-    latitude < -90 ||
-    latitude > 90 ||
-    typeof longitude !== "number" ||
-    !Number.isFinite(longitude) ||
-    longitude < -180 ||
-    longitude > 180
-  ) {
-    res.status(400).json({ message: "พิกัด latitude หรือ longitude ไม่ถูกต้อง" });
-    return;
-  }
-
-  // 6. ถ้าไม่มีที่อยู่ ให้บันทึกเป็น NULL
-  const savedAddress =
-    typeof address === "string" ? address.trim() || null : null;
-
   try {
-    // แก้ไขข้อมูลของลูกค้าที่มี id ตรงกับ URL
-    const [result] = await conn.execute<ResultSetHeader>(
-      `UPDATE customer
-       SET name = ?,
-           phone = ?,
-           address = ?,
-           latitude = ?,
-           longitude = ?
-       WHERE id = ?`,
-      [
-        name.trim(),
-        phone.trim(),
-        savedAddress,
-        latitude,
-        longitude,
-        id,
-      ]
-    );
-
-    // ถ้าไม่มีแถวได้รับผล ให้ตรวจว่าลูกค้ายังมีอยู่หรือไม่
-    if (result.affectedRows === 0) {
-      const [rows] = await conn.execute<RowDataPacket[]>(
-        "SELECT id FROM customer WHERE id = ?",
-        [id]
+    const id = customerId(req.params.id);
+    const input = customerInput(req.body);
+    await withDispatchTransaction(async db => {
+      const [customers] = await db.execute<RowDataPacket[]>(
+        "SELECT id FROM customer WHERE id = ? FOR UPDATE", [id]
       );
-
-      if (rows.length === 0) {
-        res.status(404).json({ message: "ไม่พบลูกค้า" });
-        return;
+      if (customers.length === 0) throw new HttpError(404, "ไม่พบลูกค้า");
+      const [references] = await db.execute<RowDataPacket[]>(
+        `SELECT EXISTS (
+           SELECT 1 FROM orders AS o
+           JOIN delivery_stops AS s ON s.order_id = o.id
+           JOIN delivery_jobs AS j ON j.id = s.job_id
+           JOIN delivery_plans AS p ON p.id = j.plan_id
+           WHERE o.customer_id = ? AND p.status = 'CONFIRMED'
+             AND p.delivery_date >= ?
+         ) AS has_confirmed`,
+        [id, todayInBangkok()]
+      );
+      if (Number(references[0]?.has_confirmed) === 1) {
+        throw new HttpError(409, "แก้ไขลูกค้าไม่ได้ เนื่องจากอยู่ในแผนจัดส่งที่ยืนยันแล้ว");
       }
-    }
-
-    // แก้ไขสำเร็จ หรือข้อมูลที่ส่งมาเหมือนข้อมูลเดิม
-    res.status(200).json({
-      message: "แก้ไขลูกค้าเรียบร้อยแล้ว",
-      id,
+      await db.execute<ResultSetHeader>(
+        `UPDATE customer
+         SET name = ?, phone = ?, address = ?, latitude = ?, longitude = ?
+         WHERE id = ?`,
+        [input.name, input.phone, input.address, input.latitude, input.longitude, id]
+      );
     });
+    res.json({ message: "แก้ไขลูกค้าเรียบร้อยแล้ว", id });
   } catch (error) {
-    console.error("PUT /api/customers/:id:", error);
-
-    res.status(500).json({
-      message: "แก้ไขลูกค้าไม่สำเร็จ",
-    });
+    sendApiError(res, error, "แก้ไขลูกค้าไม่สำเร็จ", "PUT /api/customers/:id");
   }
 });
 
 customerRouter.delete("/:id", async (req, res) => {
-  // 1. อ่านเลขลูกค้าจาก URL
-  const id = Number(req.params.id);
-
-  // 2. ตรวจว่าเป็นเลขลูกค้าที่ถูกต้อง
-  if (!Number.isSafeInteger(id) || id < 1 || id > 4294967295) {
-    res.status(400).json({ message: "id ลูกค้าไม่ถูกต้อง" });
-    return;
-  }
-
   try {
-    // 3. ลบลูกค้าตาม id
-    const [result] = await conn.execute<ResultSetHeader>(
-      "DELETE FROM customer WHERE id = ?",
-      [id]
-    );
-
-    // 4. ถ้าไม่มีแถวถูกลบ แปลว่าไม่พบลูกค้า
-    if (result.affectedRows === 0) {
-      res.status(404).json({ message: "ไม่พบลูกค้า" });
-      return;
-    }
-
-    // 5. ตอบกลับเมื่อลบสำเร็จ
-    res.status(200).json({
-      message: "ลบลูกค้าเรียบร้อยแล้ว",
-      id,
+    const id = customerId(req.params.id);
+    await withDispatchTransaction(async db => {
+      const [deleted] = await db.execute<ResultSetHeader>(
+        "DELETE FROM customer WHERE id = ?", [id]
+      );
+      if (deleted.affectedRows === 0) throw new HttpError(404, "ไม่พบลูกค้า");
+      return deleted;
     });
+    res.json({ message: "ลบลูกค้าเรียบร้อยแล้ว", id });
   } catch (error) {
-    // 6. ลูกค้าที่มีออเดอร์อยู่จะติดเงื่อนไข Foreign Key
-    if (
-      typeof error === "object" &&
-      error !== null &&
-      "code" in error &&
-      error.code === "ER_ROW_IS_REFERENCED_2"
-    ) {
-      res.status(409).json({
-        message: "ลบลูกค้าไม่ได้ เนื่องจากลูกค้านี้มีออเดอร์อยู่",
-      });
-      return;
-    }
-
-    // 7. ข้อผิดพลาดอื่น
-    console.error("DELETE /api/customers/:id:", error);
-
-    res.status(500).json({
-      message: "ลบลูกค้าไม่สำเร็จ",
-    });
+    const safeError = typeof error === "object" && error !== null &&
+      "code" in error && error.code === "ER_ROW_IS_REFERENCED_2"
+      ? new HttpError(409, "ลบลูกค้าไม่ได้ เนื่องจากลูกค้านี้มีออเดอร์อยู่")
+      : error;
+    sendApiError(res, safeError, "ลบลูกค้าไม่สำเร็จ", "DELETE /api/customers/:id");
   }
 });
