@@ -1,0 +1,157 @@
+<section class="ld-page ld-page--overview" id="ld-page-overview" aria-labelledby="ld-overview-heading">
+  <header class="ld-header">
+    <div class="ld-heading">
+      <h1 id="ld-overview-heading">จัดส่งมื้อเที่ยงให้ทันเวลา</h1>
+      <p>{{ dateLabel() }} · รอบจัดส่ง 11:30–12:30 น.</p>
+    </div>
+    <div class="ld-header-actions">
+      <span class="badge ld-badge">{{ store.ordersLoading() ? 'กำลังโหลด' : store.ordersError() ? 'รอการเชื่อมต่อ' : 'ข้อมูลจาก Backend' }}</span>
+      <button class="btn ld-primary" type="button" (click)="createPlan()" [disabled]="!!pendingAction() || !store.selectedDate() || !pendingOrders().length">
+        {{ pendingAction() === 'create' ? 'กำลังคำนวณ…' : 'สร้างแผนจัดส่ง' }}
+      </button>
+    </div>
+  </header>
+
+  <div class="ld-toolbar ld-overview-toolbar">
+    <label for="summary-date">วันที่จัดส่ง
+      <select class="ld-input" id="summary-date" [ngModel]="store.selectedDate()" (ngModelChange)="store.selectedDate.set($event)">
+        <option value="">ทุกวัน</option>
+        @for (date of dates(); track date) { <option [value]="date">{{ date }}</option> }
+      </select>
+    </label>
+    <label for="routing-mode">วิธีคำนวณเส้นทาง
+      <select class="ld-input" id="routing-mode" [ngModel]="routingMode()" (ngModelChange)="routingMode.set($event)">
+        <option value="road">เส้นทางถนน</option>
+        <option value="straight_line">เส้นตรง (จำลอง)</option>
+      </select>
+    </label>
+    <button class="btn ld-secondary" type="button" [disabled]="store.ordersLoading()" (click)="store.refreshAll()">
+      {{ store.ordersLoading() ? 'กำลังโหลด…' : 'โหลดข้อมูลใหม่' }}
+    </button>
+  </div>
+
+  @if (store.customersError()) { <p class="ld-alert ld-alert--error" role="alert">ลูกค้า: {{ store.customersError() }}</p> }
+  @if (store.ordersError()) { <p class="ld-alert ld-alert--error" role="alert">ออเดอร์: {{ store.ordersError() }}</p> }
+  @if (planError()) { <p class="ld-alert ld-alert--error" role="alert">{{ planError() }}</p> }
+  @if (planNotice()) { <p class="ld-alert ld-alert--success" role="status">{{ planNotice() }}</p> }
+
+  <div class="ld-stats" aria-label="สรุปการจัดส่ง">
+    <article class="card ld-stat">
+      <h2 class="ld-stat-label">ออเดอร์รอจัดแผน</h2>
+      <p class="ld-stat-number">{{ selectedPlan()?.summary.order_count ?? pendingOrders().length }}</p>
+      <p class="ld-stat-note">เฉพาะออเดอร์ที่ยังไม่มอบหมาย</p>
+    </article>
+    <article class="card ld-stat">
+      <h2 class="ld-stat-label">ข้าวกล่อง</h2>
+      <p class="ld-stat-number">{{ selectedPlan()?.summary.total_boxes ?? pendingBoxes() }}</p>
+      <p class="ld-stat-note">รวมจากออเดอร์ที่รอจัดแผน</p>
+    </article>
+    <article class="card ld-stat">
+      <h2 class="ld-stat-label">ไรเดอร์ที่ใช้</h2>
+      <p class="ld-stat-number">{{ selectedPlan()?.summary.rider_count ?? '—' }}</p>
+      <p class="ld-stat-note">{{ selectedPlan() ? 'จากแผนที่เลือก' : 'คำนวณหลังสร้างแผน' }}</p>
+    </article>
+    <article class="card ld-stat ld-stat--soft">
+      <h2 class="ld-stat-label">กำไรประมาณการ</h2>
+      <p class="ld-stat-number" [class.ld-negative]="(selectedPlan()?.summary.estimated_profit ?? 0) < 0">
+        {{ selectedPlan() ? '฿' + (selectedPlan()!.summary.estimated_profit | number:'1.0-2') : '—' }}
+      </p>
+      <p class="ld-stat-note">คำนวณจากต้นทุนและค่าจัดส่ง</p>
+    </article>
+  </div>
+
+  @if (!store.selectedDate()) {
+    <p class="ld-alert">เลือกวันที่จัดส่งเพื่อคำนวณและเปรียบเทียบแผน</p>
+  } @else if (!pendingOrders().length && !selectedPlan()) {
+    <p class="ld-alert">วันที่เลือกไม่มีออเดอร์ PENDING สำหรับสร้างแผน</p>
+  }
+
+  @if (plansForDate().length > 0) {
+    <section class="card ld-plan-comparison" aria-labelledby="ld-plan-comparison-heading">
+      <div class="ld-plan-comparison-heading">
+        <div><h2 id="ld-plan-comparison-heading">เปรียบเทียบแผนที่คำนวณ</h2><p>เลือกแผนเพื่อดูเส้นทางและยืนยัน</p></div>
+        <span>{{ plansForDate().length }} แผน</span>
+      </div>
+      <div class="ld-plan-comparison-list">
+        @for (draft of plansForDate(); track draft.id) {
+          <button class="ld-plan-choice" type="button" [class.is-selected]="selectedPlanId() === draft.id" (click)="selectPlan(draft.id)" [disabled]="!!pendingAction()" [attr.aria-pressed]="selectedPlanId() === draft.id">
+            <strong>แผน #{{ draft.id }} <small>{{ draft.is_simulation ? 'จำลอง' : 'ถนน' }}</small></strong>
+            <span>{{ draft.summary.rider_count }} ไรเดอร์ · {{ (draft.summary.total_distance_m / 1000) | number:'1.1-1' }} กม.</span>
+            <span>ค่าส่ง ฿{{ draft.summary.delivery_fee | number:'1.0-2' }}</span>
+            <span [class.ld-negative]="draft.summary.estimated_profit < 0">กำไร ฿{{ draft.summary.estimated_profit | number:'1.0-2' }}</span>
+            <small>ส่งครบ {{ timePart(draft.summary.estimated_finish_at) }} น. · {{ draft.status === 'CONFIRMED' ? 'ยืนยันแล้ว' : draft.stale ? 'ล้าสมัย' : 'ฉบับร่าง' }}</small>
+          </button>
+        }
+      </div>
+    </section>
+  }
+
+  @if (selectedPlan(); as plan) {
+    <div class="card ld-plan-selector">
+      <span class="badge ld-badge" [class.ld-badge--confirmed]="plan.status === 'CONFIRMED'">
+        {{ plan.status === 'CONFIRMED' ? 'ยืนยันแล้ว' : plan.stale ? 'แผนล้าสมัย' : 'ฉบับร่าง' }}
+      </span>
+      <button class="btn ld-secondary" type="button" (click)="createPlan()" [disabled]="!!pendingAction() || !pendingOrders().length">
+        {{ pendingAction() === 'create' ? 'กำลังคำนวณ…' : 'คำนวณแผนใหม่ ↻' }}
+      </button>
+    </div>
+    @if (plan.stale) { <p class="ld-alert ld-alert--error" role="alert">ออเดอร์หรือข้อมูลลูกค้าเปลี่ยนหลังคำนวณแผน กรุณาคำนวณใหม่ก่อนยืนยัน</p> }
+    @if (plan.is_simulation) { <p class="ld-alert">แผนนี้ใช้ระยะทางเส้นตรงเพื่อจำลอง ไม่ใช่ระยะทางถนน</p> }
+
+    <div class="ld-dispatch-grid">
+      <section class="card ld-map-card" aria-labelledby="ld-map-heading">
+        <div class="ld-map-toolbar">
+          <h2 id="ld-map-heading">แผนเส้นทางจัดส่ง</h2>
+          <span class="badge ld-badge">{{ plan.is_simulation ? 'เส้นทางจำลอง' : 'เส้นทางถนน' }}</span>
+        </div>
+        <div class="ld-map-art ld-plan-map-art">
+          <app-dispatch-map [plan]="plan" [selectedJobId]="selectedJobId()" (selectedJobIdChange)="selectJob($event)" />
+        </div>
+        <div class="ld-map-legend" aria-label="สีเส้นทางไรเดอร์">
+          @for (route of routeViews(); track route.job.id; let index = $index) {
+            <span [title]="route.job.job_code"><i class="ld-route-dot" [style.background]="route.job.color" aria-hidden="true"></i>ไรเดอร์ {{ index + 1 }}</span>
+          }
+        </div>
+      </section>
+
+      <section class="ld-rider-jobs" aria-labelledby="ld-jobs-heading">
+        <div class="ld-jobs-heading"><h2 id="ld-jobs-heading">ใบงานในแผน</h2><span>{{ plan.jobs.length }} ใบงาน</span></div>
+        @for (route of routeViews(); track route.job.id; let index = $index) {
+          <button class="card ld-job" type="button" [class.is-active]="selectedJobId() === route.job.id" (click)="selectJob(route.job.id)" [attr.aria-pressed]="selectedJobId() === route.job.id">
+            <strong><i class="ld-route-dot" [style.background]="route.job.color" aria-hidden="true"></i> ไรเดอร์ {{ index + 1 }} · {{ route.job.job_code }}</strong>
+            <span>{{ route.job.stops.length }} ออเดอร์ · {{ route.job.total_boxes }} กล่อง · {{ (route.job.distance_m / 1000) | number:'1.1-1' }} กม.</span>
+            <small>ส่งครบ {{ route.finishTime }} · ค่าส่ง ฿{{ route.job.delivery_fee | number:'1.0-2' }}</small>
+          </button>
+        }
+        @if (selectedJob(); as job) {
+          <section class="card ld-plan-stops" aria-label="จุดส่งในใบงานที่เลือก">
+            <h3>ลำดับจุดส่ง</h3>
+            <ol>
+              @for (stop of job.stops; track stop.id) {
+                <li>
+                  <span class="ld-stop-number">{{ stop.sequence_no }}</span>
+                  <div><strong>{{ stop.customer_name }}</strong><small>{{ stop.address || stop.phone }}</small><small>{{ stop.quantity }} กล่อง · ถึงประมาณ {{ timePart(stop.estimated_delivery_at) }}</small></div>
+                </li>
+              }
+            </ol>
+          </section>
+        }
+      </section>
+    </div>
+
+    <section class="card ld-cost-summary" aria-label="ค่าใช้จ่ายและเวลาจัดส่ง">
+      <div><p>รายได้</p><strong>฿{{ plan.summary.revenue | number:'1.0-2' }}</strong></div>
+      <div><p>ต้นทุนอาหาร</p><strong>฿{{ plan.summary.food_cost | number:'1.0-2' }}</strong></div>
+      <div><p>ค่าจัดส่ง</p><strong>฿{{ plan.summary.delivery_fee | number:'1.0-2' }}</strong></div>
+      <div><p>คาดว่าส่งครบ</p><strong class="ld-positive">{{ timePart(plan.summary.estimated_finish_at) }} น.</strong></div>
+      <button class="btn ld-primary" type="button" (click)="confirmPlan()" [disabled]="!!pendingAction() || !plan.can_confirm">
+        {{ pendingAction() === 'confirm' ? 'กำลังยืนยัน…' : plan.status === 'CONFIRMED' ? 'ยืนยันแล้ว' : 'ยืนยันแผนนี้' }}
+      </button>
+    </section>
+  } @else {
+    <section class="card ld-overview-empty">
+      <strong>ยังไม่มีแผนจัดส่งสำหรับวันที่เลือก</strong>
+      <p>เลือกวันที่ที่มีออเดอร์ PENDING แล้วกด “สร้างแผนจัดส่ง” เพื่อคำนวณเส้นทางและต้นทุน</p>
+    </section>
+  }
+</section>

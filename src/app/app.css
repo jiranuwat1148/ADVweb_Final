@@ -2,3 +2,6 @@
 :host { display: block; }
 app-customer-page, app-order-page { display: contents; }
 app-customer-page[hidden], app-order-page[hidden] { display: none !important; }
+app-overview-page { display: contents; }
+app-overview-page[hidden] { display: none !important; }
+.ld-logout { width: 100%; }

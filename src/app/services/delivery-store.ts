@@ -58,4 +58,16 @@ export class DeliveryStore {
   async refreshAll(): Promise<void> {
     await Promise.allSettled([this.loadCustomers(), this.loadOrders()]);
   }
+
+  clear(): void {
+    this.customersRequest++;
+    this.ordersRequest++;
+    this.customers.set([]);
+    this.orders.set([]);
+    this.customersLoading.set(false);
+    this.ordersLoading.set(false);
+    this.customersError.set('');
+    this.ordersError.set('');
+    this.selectedDate.set('');
+  }
 }

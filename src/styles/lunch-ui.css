@@ -90,6 +90,9 @@
 .ld-text-action:hover { text-decoration: underline; }
 .ld-map-art { background: var(--ld-page); overflow: hidden; }
 .ld-map-art > svg { display: block; max-width: 100%; height: auto; }
+.ld-map-stop-icon, .ld-map-shop-icon { border: 0 !important; background: transparent !important; }
+.ld-map-stop-icon span { display: grid; width: 28px; height: 28px; place-items: center; border: 3px solid #fff; border-radius: 50%; background: var(--route-color); color: #fff; font-size: 11px; font-weight: 700; box-shadow: 0 1px 4px #20342b66; }
+.ld-map-shop-icon span { display: inline-flex; align-items: center; justify-content: center; min-width: 42px; height: 32px; padding: 0 7px; border: 2px solid #fff; border-radius: 9px; background: var(--ld-forest); color: #fff; font-size: 12px; font-weight: 700; box-shadow: 0 1px 4px #20342b66; }
 .ld-map-legend { display: flex; align-items: center; gap: 24px; padding: 16px; font-size: 12px; line-height: 20px; color: var(--ld-muted); }
 .ld-map-legend > span { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
 .ld-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; flex: none; }

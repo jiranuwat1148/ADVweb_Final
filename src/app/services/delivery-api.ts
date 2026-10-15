@@ -42,6 +42,13 @@ export interface SimulateResult {
   delivery_date: string;
 }
 
+export interface LoginResult {
+  token: string;
+  token_type: 'Bearer';
+  expires_in: number;
+  user: { username: string };
+}
+
 export function errorMessage(error: unknown): string {
   if (error instanceof HttpErrorResponse) {
     if (typeof error.error?.message === 'string') return error.error.message;
@@ -61,6 +68,10 @@ export class DeliveryApi {
 
   private customer(row: RawCustomer): Customer {
     return { ...row, id: Number(row.id), latitude: Number(row.latitude), longitude: Number(row.longitude) };
+  }
+
+  login(body: { username: string; password: string }): Promise<LoginResult> {
+    return firstValueFrom(this.http.post<LoginResult>(`${this.base}/auth/login`, body));
   }
 
   async listCustomers(): Promise<Customer[]> {
