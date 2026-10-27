@@ -1,5 +1,6 @@
-.ld-login-app { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: var(--ld-page); }
-.ld-login-card { width: min(100%, 420px); padding: 32px; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; border: 1px solid var(--ld-border); border-radius: 20px; background: var(--ld-surface); }
+.ld-login-app { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; background: var(--ld-page); }
+.ld-login-stack { width: min(100%, 420px); display: flex; flex-direction: column; }
+.ld-login-card { width: 100%; padding: 32px; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; border: 1px solid var(--ld-border); border-radius: 0 20px 20px 20px; background: var(--ld-surface); }
 .ld-login-card .ld-brand-mark { margin-bottom: 4px; }
 .ld-login-kicker { color: var(--ld-green); font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 600; }
 .ld-login-card h1 { color: var(--ld-forest); font-size: 24px; font-weight: 700; line-height: 36px; }
@@ -9,3 +10,15 @@
 .ld-login-card .ld-input { width: 100%; min-height: 48px; padding: 12px; border: 1px solid var(--ld-border); border-radius: 12px; background: var(--ld-surface); color: var(--ld-text); }
 .ld-login-card .btn { width: 100%; margin-top: 8px; }
 .ld-login-card > small { color: var(--ld-muted); font-size: 11px; }
+
+/* แท็บแบบแฟ้มที่ติดมุมบนซ้ายของการ์ด */
+.ld-login-tabs { display: flex; gap: 4px; margin-bottom: -1px; position: relative; z-index: 1; }
+.ld-login-tab { min-height: 44px; padding: 10px 18px; border: 1px solid var(--ld-border); border-radius: 14px 14px 0 0; background: var(--ld-page); color: var(--ld-muted); font-size: 14px; font-weight: 600; }
+.ld-login-tab:hover { color: var(--ld-green); }
+.ld-login-tab.is-active { background: var(--ld-surface); color: var(--ld-green); border-bottom-color: var(--ld-surface); }
+
+/* ตอนเปิดใบงานแล้ว ใบงานไม่ใช่การ์ด จึงให้แท็บมีเส้นใต้แทน */
+.ld-login-stack--sheet { width: min(100%, 480px); align-self: start; }
+.ld-login-stack--sheet .ld-login-tabs { margin-bottom: 0; padding-bottom: 0; border-bottom: 1px solid var(--ld-border); }
+.ld-login-stack--sheet .ld-login-tab.is-active { border-bottom-color: var(--ld-border); }
+.ld-login-stack--sheet #ld-panel-rider { padding-top: 16px; }

@@ -1,19 +1,37 @@
 <main class="ld-app ld-login-app" data-theme="lunch">
-  <section class="card ld-login-card" aria-labelledby="ld-login-heading">
-    <div class="ld-brand-mark" aria-hidden="true">ท</div>
-    <p class="ld-login-kicker">Lunch Dispatch</p>
-    <h1 id="ld-login-heading">เข้าสู่ระบบเจ้าของร้าน</h1>
-    <p class="ld-login-copy">เข้าสู่ระบบเพื่อดูออเดอร์และวางแผนเส้นทางจัดส่ง</p>
-    @if (error()) { <p class="ld-alert ld-alert--error" role="alert">{{ error() }}</p> }
-    <form (ngSubmit)="login()">
-      <label for="ld-login-username">ชื่อผู้ใช้</label>
-      <input class="ld-input" id="ld-login-username" name="username" autocomplete="username" required maxlength="100" [ngModel]="username()" (ngModelChange)="username.set($event)">
-      <label for="ld-login-password">รหัสผ่าน</label>
-      <input class="ld-input" id="ld-login-password" name="password" type="password" autocomplete="current-password" required [ngModel]="password()" (ngModelChange)="password.set($event)">
-      <button class="btn ld-primary" type="submit" [disabled]="busy() || !username().trim() || !password()">
-        {{ busy() ? 'กำลังเข้าสู่ระบบ…' : 'เข้าสู่ระบบ' }}
-      </button>
-    </form>
-    <small>บัญชีผู้ใช้ต้องตั้งค่าไว้ที่ Backend ก่อนใช้งาน</small>
-  </section>
+  <div class="ld-login-stack" [class.ld-login-stack--sheet]="mode() === 'rider' && riderSheetOpen()">
+    <!-- แท็บมุมบนซ้ายของการ์ด: สลับระหว่างเจ้าของร้านกับไรเดอร์ -->
+    <div class="ld-login-tabs" role="tablist" aria-label="เลือกประเภทผู้ใช้">
+      <button class="ld-login-tab" type="button" role="tab" id="ld-tab-owner" aria-controls="ld-panel-owner"
+              [class.is-active]="mode() === 'owner'" [attr.aria-selected]="mode() === 'owner'"
+              (click)="setMode('owner')">เจ้าของร้าน</button>
+      <button class="ld-login-tab" type="button" role="tab" id="ld-tab-rider" aria-controls="ld-panel-rider"
+              [class.is-active]="mode() === 'rider'" [attr.aria-selected]="mode() === 'rider'"
+              (click)="setMode('rider')">ไรเดอร์</button>
+    </div>
+
+    @if (mode() === 'owner') {
+      <section class="card ld-login-card" id="ld-panel-owner" role="tabpanel" aria-labelledby="ld-tab-owner">
+        <div class="ld-brand-mark" aria-hidden="true">ท</div>
+        <p class="ld-login-kicker">Lunch Dispatch</p>
+        <h1 id="ld-login-heading">เข้าสู่ระบบเจ้าของร้าน</h1>
+        <p class="ld-login-copy">เข้าสู่ระบบเพื่อดูออเดอร์และวางแผนเส้นทางจัดส่ง</p>
+        @if (error()) { <p class="ld-alert ld-alert--error" role="alert">{{ error() }}</p> }
+        <form (ngSubmit)="login()">
+          <label for="ld-login-username">ชื่อผู้ใช้</label>
+          <input class="ld-input" id="ld-login-username" name="username" autocomplete="username" required maxlength="100" [ngModel]="username()" (ngModelChange)="username.set($event)">
+          <label for="ld-login-password">รหัสผ่าน</label>
+          <input class="ld-input" id="ld-login-password" name="password" type="password" autocomplete="current-password" required [ngModel]="password()" (ngModelChange)="password.set($event)">
+          <button class="btn ld-primary" type="submit" [disabled]="busy() || !username().trim() || !password()">
+            {{ busy() ? 'กำลังเข้าสู่ระบบ…' : 'เข้าสู่ระบบ' }}
+          </button>
+        </form>
+        <small>บัญชีผู้ใช้ต้องตั้งค่าไว้ที่ Backend ก่อนใช้งาน</small>
+      </section>
+    } @else {
+      <div id="ld-panel-rider" role="tabpanel" aria-labelledby="ld-tab-rider">
+        <app-rider-job-page (sheetOpenChange)="riderSheetOpen.set($event)"></app-rider-job-page>
+      </div>
+    }
+  </div>
 </main>
