@@ -99,7 +99,7 @@ npm test -- --watch=false
 ```
 
 Backend:
-
+npx tsx watch server.ts
 ```powershell
 cd backend
 npm run typecheck
