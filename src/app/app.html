@@ -26,7 +26,7 @@
         <p>ส่งให้ทัน ทุกมื้อมีความสุข</p>
       </div>
       <p class="ld-system-status" [class.ld-connection-error]="hasError()"><span aria-hidden="true">●</span> {{ loading() ? 'กำลังโหลดข้อมูล' : hasError() ? 'เชื่อมข้อมูลไม่สำเร็จ' : 'เชื่อม Backend แล้ว' }}</p>
-      <button class="btn ld-secondary ld-logout" type="button" (click)="logout()">ออกจากระบบ ({{ auth.username() }})</button>
+      <button class="btn ld-secondary ld-logout" type="button" (click)="logout()">ออกจากระบบ</button>
     </aside>
 
     <main class="ld-content">
