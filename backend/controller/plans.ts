@@ -16,6 +16,24 @@ import { readPlan, publicPlan, validatePlanCoverage } from "../services/plan-rep
 export const planRouter = Router();
 const colors = ["#D97058", "#8B75C9", "#5F91CB", "#D7A45C", "#217A54", "#C15B82"];
 
+planRouter.get("/", async (req, res) => {
+  try {
+    const date = req.query.delivery_date;
+    if (!isDeliveryDate(date)) throw new HttpError(400, "วันที่ส่งต้องเป็นวันที่จริงในรูปแบบ YYYY-MM-DD");
+    const [rows] = await conn.execute<RowDataPacket[]>(
+      "SELECT id FROM delivery_plans WHERE delivery_date = ? AND plan_json IS NOT NULL ORDER BY id DESC",
+      [date],
+    );
+    const plans = await Promise.all(rows.map(row => readPlan(conn, Number(row.id))));
+    const drafts = plans.filter(plan => plan.status === "DRAFT");
+    const current = drafts.length ? await readPendingOrders(conn, date) : [];
+    const fingerprint = drafts.length ? sourceFingerprint(current) : "";
+    res.json(plans.map(plan => publicPlan(plan, plan.status === "DRAFT" && fingerprint !== plan.stored.source_fingerprint)));
+  } catch (error) {
+    sendApiError(res, error, "อ่านแผนจัดส่งไม่สำเร็จ", "GET /api/plans");
+  }
+});
+
 function getShop(body: Record<string, unknown>): ShopLocation {
   const value = body.shop as Partial<ShopLocation> | undefined;
   const latitude = value?.latitude ?? (process.env.SHOP_LATITUDE ? Number(process.env.SHOP_LATITUDE) : undefined);
@@ -61,7 +79,7 @@ planRouter.post("/", async (req, res) => {
     }
     let matrix: number[][];
     try { matrix = await buildDistanceMatrix(source, shop, mode); }
-    catch { throw new HttpError(502, "บริการคำนวณเส้นทางไม่พร้อม กรุณาลองใหม่ หรือเลือกโหมด straight_line สำหรับจำลอง"); }
+    catch { throw new HttpError(502, "บริการคำนวณเส้นทางถนนไม่พร้อม กรุณาลองใหม่ภายหลัง"); }
     let calculation: ReturnType<typeof buildPlan>;
     try { calculation = buildPlan(source, shop, matrix); }
     catch (error) { throw new HttpError(422, error instanceof Error ? error.message : "ไม่สามารถสร้างแผนที่ส่งทันเวลาได้"); }

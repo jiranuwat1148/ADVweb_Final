@@ -51,10 +51,8 @@
             <div class="rj-actions">
               <a class="rj-btn rj-btn--primary" [href]="stopMapUrl(stop)" target="_blank" rel="noopener"
                  [attr.aria-label]="'เปิดแผนที่ไปจุดที่ ' + (i + 1) + ' คุณ' + stop.customer_name">เปิดแผนที่ ↗</a>
-              @if (stop.phone) {
-                <a class="rj-btn rj-btn--ghost" [href]="'tel:' + stop.phone"
-                   [attr.aria-label]="'โทรหาคุณ' + stop.customer_name">โทร</a>
-              }
+              <a class="rj-btn rj-btn--ghost"
+                  [attr.aria-label]="'โทรหาคุณ' + stop.customer_name">โทร</a>
             </div>
           </div>
         </li>

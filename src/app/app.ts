@@ -3,6 +3,7 @@ import { OverviewPage } from './pages/overview/overview-page';
 import { LoginPage } from './pages/login/login-page';
 import { CustomerPage } from './pages/customers/customer-page';
 import { OrderPage } from './pages/orders/order-page';
+import { RiderOverviewPage } from './pages/rider/rider-overview-page';
 import { AuthSession } from './services/auth-session';
 import { DeliveryStore } from './services/delivery-store';
 
@@ -10,7 +11,7 @@ type Page = 'overview' | 'orders' | 'customers' | 'rider';
 
 @Component({
   selector: 'app-root',
-  imports: [OverviewPage, LoginPage, CustomerPage, OrderPage],
+  imports: [OverviewPage, LoginPage, CustomerPage, OrderPage, RiderOverviewPage],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

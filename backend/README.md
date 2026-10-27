@@ -45,6 +45,7 @@ Base URL: http://localhost:3000
 | DELETE | /api/orders/:id | ลบ/ยกเลิกออเดอร์ PENDING | เจ้าของร้าน |
 | POST | /api/orders/simulate | จำลองออเดอร์ 20–30 รายการ | เจ้าของร้าน |
 | POST | /api/plans | คำนวณและบันทึกแผน DRAFT | เจ้าของร้าน |
+| GET | /api/plans?delivery_date=YYYY-MM-DD | แผนที่บันทึกไว้ของวันที่เลือก | เจ้าของร้าน |
 | GET | /api/plans/:id | รายละเอียดแผน ใบงาน เส้นทาง และต้นทุน | เจ้าของร้าน |
 | POST | /api/plans/:id/confirm | ยืนยันแผนและเปลี่ยนออเดอร์เป็น ASSIGNED | เจ้าของร้าน |
 | POST | /api/rider/jobs/lookup | ค้นหาใบงานด้วย job_code | ไม่ต้องมี token เจ้าของร้าน |

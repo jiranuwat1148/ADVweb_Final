@@ -19,12 +19,6 @@
         @for (date of dates(); track date) { <option [value]="date">{{ date }}</option> }
       </select>
     </label>
-    <label for="routing-mode">วิธีคำนวณเส้นทาง
-      <select class="ld-input" id="routing-mode" [ngModel]="routingMode()" (ngModelChange)="routingMode.set($event)">
-        <option value="road">เส้นทางถนน</option>
-        <option value="straight_line">เส้นตรง (จำลอง)</option>
-      </select>
-    </label>
     <button class="btn ld-secondary" type="button" [disabled]="store.ordersLoading()" (click)="store.refreshAll()">
       {{ store.ordersLoading() ? 'กำลังโหลด…' : 'โหลดข้อมูลใหม่' }}
     </button>

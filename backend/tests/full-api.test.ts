@@ -20,7 +20,8 @@ const db: any = {
     if (sql.includes("GET_LOCK")) return [[{ acquired: 1 }]];
     if (sql.includes("RELEASE_LOCK")) return [[{ released: 1 }]];
     if (sql.includes("FROM orders o JOIN customer c")) return [source.filter(order => order.delivery_date === values[0] && order.status === "PENDING")];
-    if (sql.startsWith("SELECT id FROM delivery_plans")) return [[...plans.values()].filter(plan => plan.delivery_date === values[0] && plan.status === "CONFIRMED").map(plan => ({ id: plan.id }))];
+    if (sql.includes("WHERE delivery_date = ? AND status = 'CONFIRMED'")) return [[...plans.values()].filter(plan => plan.delivery_date === values[0] && plan.status === "CONFIRMED").map(plan => ({ id: plan.id }))];
+    if (sql.includes("WHERE delivery_date = ? AND plan_json IS NOT NULL")) return [[...plans.values()].filter(plan => plan.delivery_date === values[0]).map(plan => ({ id: plan.id }))];
     if (sql.startsWith("INSERT INTO delivery_plans")) {
       const id = ++planSequence;
       plans.set(id, { id, delivery_date: values[0], departure_at: values[1], deadline_at: values[2], status: "DRAFT", plan_json: values[3] });
@@ -96,7 +97,7 @@ before(async () => {
 after(async () => { globalThis.fetch = originalFetch; if (server) await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve())); });
 
 test("owner routes reject anonymous requests", async () => {
-  for (const path of ["/api/customers", "/api/orders", "/api/plans/1"]) assert.equal((await request(path, "GET", undefined, false)).status, 401);
+  for (const path of ["/api/customers", "/api/orders", "/api/plans/1", `/api/plans?delivery_date=${today}`]) assert.equal((await request(path, "GET", undefined, false)).status, 401);
 });
 
 test("create, read, confirm, retry, and rider lookup complete one dispatch flow", async () => {
@@ -113,12 +114,18 @@ test("create, read, confirm, retry, and rider lookup complete one dispatch flow"
   const read = await request(`/api/plans/${id}`);
   assert.equal(read.status, 200);
   assert.equal(read.data.stale, false);
+  const saved = await request(`/api/plans?delivery_date=${today}`);
+  assert.equal(saved.status, 200);
+  assert.equal(saved.data.length, 1);
+  assert.equal(saved.data[0].jobs[0].geometry.type, "LineString");
+  assert.equal(saved.data[0].jobs[0].job_code, read.data.jobs[0].job_code);
   const code = read.data.jobs[0].job_code;
   assert.match(code, /^LX-[A-F0-9]{24}$/);
   assert.equal((await request("/api/rider/jobs/lookup", "POST", { job_code: code }, false)).status, 404);
   const confirmed = await request(`/api/plans/${id}/confirm`, "POST", {});
   assert.equal(confirmed.status, 200, JSON.stringify(confirmed.data));
   assert.equal(confirmed.data.status, "CONFIRMED");
+  assert.equal((await request(`/api/plans?delivery_date=${today}`)).data[0].status, "CONFIRMED");
   assert.equal(assigned, 3);
   const beforeJobs = jobs.length;
   const retry = await request(`/api/plans/${id}/confirm`, "POST", {});
@@ -142,6 +149,7 @@ test("customer or order change makes a draft stale and confirmation rolls back",
   assert.equal(created.status, 201);
   source[0].quantity = 2;
   assert.equal((await request(`/api/plans/${created.data.id}`)).data.stale, true);
+  assert.equal((await request(`/api/plans?delivery_date=${today}`)).data[0].stale, true);
   const confirmation = await request(`/api/plans/${created.data.id}/confirm`, "POST", {});
   assert.equal(confirmation.status, 409);
   assert.equal(assigned, 0);

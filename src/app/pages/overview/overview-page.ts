@@ -2,7 +2,7 @@ import { DecimalPipe } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { errorMessage } from '../../services/delivery-api';
-import { DeliveryPlan, PlanApi, PlanJob, RoutingMode } from '../../services/plan-api';
+import { DeliveryPlan, PlanApi, PlanJob } from '../../services/plan-api';
 import { DeliveryStore } from '../../services/delivery-store';
 import { DispatchMapComponent } from './dispatch-map.component';
 
@@ -22,7 +22,6 @@ export class OverviewPage {
   readonly store = inject(DeliveryStore);
   private readonly planApi = inject(PlanApi);
 
-  readonly routingMode = signal<RoutingMode>('road');
   readonly drafts = signal<DeliveryPlan[]>([]);
   readonly selectedPlanId = signal<number | null>(null);
   readonly selectedJobId = signal<number | null>(null);
@@ -52,7 +51,13 @@ export class OverviewPage {
       ? new Intl.DateTimeFormat('th-TH', { timeZone: 'Asia/Bangkok', dateStyle: 'long' }).format(new Date(`${date}T12:00:00Z`))
       : 'เลือกวันที่เพื่อจัดแผน';
   });
+  private plansRequest = 0;
+
   constructor() {
+    effect(() => {
+      const date = this.store.selectedDate();
+      if (date) void this.loadPlans(date);
+    });
     effect(() => {
       const date = this.store.selectedDate();
       const plans = this.drafts().filter(plan => plan.delivery_date === date);
@@ -61,6 +66,17 @@ export class OverviewPage {
       this.selectedPlanId.set(newest?.id ?? null);
       this.selectedJobId.set(newest?.jobs[0]?.id ?? null);
     });
+  }
+
+  private async loadPlans(date: string): Promise<void> {
+    const request = ++this.plansRequest;
+    try {
+      const plans = await this.planApi.list(date);
+      if (request !== this.plansRequest || this.store.selectedDate() !== date) return;
+      this.drafts.update(current => [...plans, ...current.filter(plan => plan.delivery_date !== date)]);
+    } catch (error) {
+      if (request === this.plansRequest && this.store.selectedDate() === date) this.planError.set(errorMessage(error));
+    }
   }
 
   async createPlan(): Promise<void> {
@@ -79,7 +95,7 @@ export class OverviewPage {
     this.planError.set('');
     this.planNotice.set('');
     try {
-      const plan = await this.planApi.create(date, this.routingMode());
+      const plan = await this.planApi.create(date, 'road');
       this.savePlan(plan);
       this.planNotice.set(`สร้างแผน #${plan.id} แล้ว${plan.is_simulation ? ' (โหมดจำลอง)' : ''}`);
     } catch (error) {

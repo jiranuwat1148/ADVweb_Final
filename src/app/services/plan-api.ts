@@ -75,6 +75,10 @@ export class PlanApi {
     }));
   }
 
+  list(deliveryDate: string): Promise<DeliveryPlan[]> {
+    return firstValueFrom(this.http.get<DeliveryPlan[]>(this.base, { params: { delivery_date: deliveryDate } }));
+  }
+
   get(id: number): Promise<DeliveryPlan> {
     return firstValueFrom(this.http.get<DeliveryPlan>(`${this.base}/${id}`));
   }

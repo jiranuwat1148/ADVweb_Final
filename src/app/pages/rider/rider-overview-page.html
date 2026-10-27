@@ -1,0 +1,46 @@
+<section class="ld-page ld-page--rider ld-rider-overview" aria-labelledby="rider-overview-title">
+  <header class="rider-overview-header">
+    <div>
+      <h1 id="rider-overview-title">แผนงานไรเดอร์</h1>
+      <label class="rider-overview-date" for="rider-overview-date">
+        วันที่จัดส่ง
+        <select id="rider-overview-date" class="ld-input" [ngModel]="selectedDate()" (ngModelChange)="setDate($event)">
+          @for (date of dates(); track date) { <option [value]="date">{{ date }}</option> }
+        </select>
+      </label>
+      <p>{{ dateLabel() }} · แสดงเฉพาะแผนที่ยืนยันแล้ว</p>
+    </div>
+    <button class="btn ld-secondary" type="button" (click)="refresh()" [disabled]="loading()">
+      {{ loading() ? 'กำลังโหลด…' : 'โหลดข้อมูลใหม่' }}
+    </button>
+  </header>
+
+  @if (error()) {
+    <p class="ld-alert ld-alert--error" role="alert">{{ error() }}</p>
+  } @else if (loading() && !plan()) {
+    <p class="ld-alert" role="status">กำลังโหลดแผนงานวันนี้…</p>
+  } @else if (plan(); as confirmed) {
+    <div class="rider-overview-summary">
+      <span class="badge ld-badge ld-badge--confirmed">ยืนยันแล้ว · แผน #{{ confirmed.id }}</span>
+      <span>{{ confirmed.jobs.length }} ไรเดอร์ · {{ confirmed.summary.order_count }} ออเดอร์ · {{ confirmed.summary.total_boxes }} กล่อง</span>
+    </div>
+    <div class="rider-overview-jobs">
+      @for (job of confirmed.jobs; track job.id; let index = $index) {
+        <article class="card rider-overview-job">
+          <div class="rider-overview-job-heading">
+            <span class="rider-overview-number">ไรเดอร์ลำดับที่ {{ index + 1 }}</span>
+            <span class="badge ld-badge">{{ job.stops.length }} จุดส่ง</span>
+          </div>
+          <p class="rider-overview-code-label">Job code</p>
+          <h2>{{ job.job_code }}</h2>
+          <p>{{ job.total_boxes }} กล่อง · {{ (job.distance_m / 1000) | number:'1.1-1' }} กม.</p>
+        </article>
+      }
+    </div>
+  } @else {
+    <section class="card rider-overview-empty">
+      <strong>วันที่เลือกยังไม่มีแผนที่ยืนยัน</strong>
+      <p>แผนงานจะแสดงที่นี่หลังยืนยันแผนจัดส่งของวันที่เลือกจากหน้าภาพรวม</p>
+    </section>
+  }
+</section>
